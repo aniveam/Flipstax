@@ -114,7 +114,7 @@ export function Home() {
               <Image
                 pos="absolute"
                 src="/img/Artwork.png"
-                height={350}
+                h={{ xs: 275, md: 300, lg: 350, xl: 375 }}
                 width="100%"
                 style={{
                   opacity: 0.75,
@@ -124,7 +124,7 @@ export function Home() {
               <Image
                 style={{ zIndex: 50 }}
                 pos="relative"
-                h={350}
+                h={{ xs: 275, md: 300, lg: 350, xl: 375 }}
                 width="100%"
                 fit="contain"
                 src={
