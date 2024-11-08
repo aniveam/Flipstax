@@ -3,8 +3,8 @@ import {
   Button,
   Flex,
   Grid,
-  Text,
   Image,
+  Text,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
@@ -21,7 +21,7 @@ export function Navbar() {
       pos="sticky"
       top={0}
       p="md"
-      h="80"
+      h="80px"
       bg={colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[0]}
       style={{
         zIndex: 50,
@@ -35,28 +35,25 @@ export function Navbar() {
             <Image
               src="/img/logo.png"
               alt="Flipstax Logo"
-              width={55}
-              height={55}
+              width={50}
+              height={50}
               fit="contain"
             />
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
-          <Flex justify="center" align="center" gap="sm">
-            <Text>Home</Text>
-            <Text>How It Works</Text>
+          <Flex justify="center" align="center" gap="md">
+            <Text fw={600}>Home</Text>
+            <Text fw={600}>How It Works</Text>
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
-          <Flex justify="flex-end" align="center" gap="sm">
+          <Flex justify="flex-end" align="center" gap="xs">
             <Button variant="filled" radius="xl">
               Log In
             </Button>
-            <Button variant="filled" radius="xl">
-              <i
-                onClick={toggleColorScheme}
-                className="fa-solid fa-circle-half-stroke"
-              ></i>
+            <Button onClick={toggleColorScheme} variant="filled" radius="xl">
+              <i className="fa-solid fa-circle-half-stroke"></i>
             </Button>
           </Flex>
         </Grid.Col>
