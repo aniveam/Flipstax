@@ -1,6 +1,7 @@
+import { MotionButton } from "@/components/MotionButton";
+import { MotionLink } from "@/components/MotionLink";
 import {
   Box,
-  Button,
   Flex,
   Grid,
   Image,
@@ -43,18 +44,26 @@ export function Navbar() {
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
           <Flex justify="center" align="center" gap="md">
-            <Text fw={600}>Home</Text>
-            <Text fw={600}>How It Works</Text>
+            <Text fw={500}>Home</Text>
+            <Text fw={500}>How It Works</Text>
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
           <Flex justify="flex-end" align="center" gap="xs">
-            <Button variant="filled" radius="xl">
+            <MotionLink
+              href="/login"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
               Log In
-            </Button>
-            <Button onClick={toggleColorScheme} variant="filled" radius="xl">
+            </MotionLink>
+            <MotionButton
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+              onClick={toggleColorScheme}
+            >
               <i className="fa-solid fa-circle-half-stroke"></i>
-            </Button>
+            </MotionButton>
           </Flex>
         </Grid.Col>
       </Grid>

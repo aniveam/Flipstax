@@ -1,0 +1,30 @@
+.light {
+  --background-color: var(
+    --mantine-color-blue-light
+  ); /* Light blue background */
+  --text-color: var(--mantine-color-dark-9); /* Dark text color */
+}
+
+.dark {
+  --background-color: var(
+    --mantine-color-dark-8
+  ); /* Darker background for dark mode */
+  --text-color: var(
+    --mantine-color-gray-0
+  ); /* Light text color for dark mode */
+}
+
+.box {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}

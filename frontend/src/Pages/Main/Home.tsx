@@ -1,10 +1,9 @@
 import { Navbar } from "@/components/layout/Navbar";
+import { MotionLink } from "@/components/MotionLink";
 import { motion } from "framer-motion";
-import React from "react";
 
 import {
   Box,
-  Button,
   Container,
   Flex,
   Image,
@@ -12,16 +11,6 @@ import {
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
-
-type Props = { children?: React.ReactNode };
-const button = React.forwardRef<HTMLAnchorElement, Props>((props, ref) => {
-  return (
-    <Button component="a" href="/login" radius="xl" variant="filled" ref={ref}>
-      {props.children}
-    </Button>
-  );
-});
-const MotionButton = motion(button);
 
 export function Home() {
   const { colorScheme } = useMantineColorScheme();
@@ -66,7 +55,7 @@ export function Home() {
             >
               <Text
                 size="xl"
-                fw={500}
+                fw={450}
                 ta="center"
                 style={{
                   fontFamily: "Inter, sans-serif",
@@ -82,7 +71,8 @@ export function Home() {
               animate="end"
               transition={{ duration: 0.9, delay: 0.1 }}
             >
-              <MotionButton
+              <MotionLink
+                href="/login"
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.2 }}
               >
@@ -91,7 +81,7 @@ export function Home() {
                   className="fa-regular fa-hand-pointer"
                   style={{ paddingLeft: "5px" }}
                 ></i>
-              </MotionButton>
+              </MotionLink>
             </motion.div>
 
             <motion.div
