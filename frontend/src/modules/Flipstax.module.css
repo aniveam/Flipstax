@@ -3,6 +3,7 @@
     --mantine-color-blue-light
   ); /* Light blue background */
   --text-color: var(--mantine-color-dark-9); /* Dark text color */
+  --hover-color: var(--mantine-color-blue-9);
 }
 
 .dark {
@@ -12,6 +13,7 @@
   --text-color: var(
     --mantine-color-gray-0
   ); /* Light text color for dark mode */
+  --hover-color: var(--mantine-color-dark-1);
 }
 
 .box {
@@ -27,4 +29,8 @@
   align-items: center;
   text-decoration: none;
   color: inherit;
+}
+
+.customAnchor:hover {
+  color: var(--hover-color);
 }

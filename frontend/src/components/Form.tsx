@@ -28,6 +28,7 @@ interface FormData {
 export function Form({ type }: FormProps) {
   const { colorScheme } = useMantineColorScheme();
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = (isLogin ? "Log In" : "Register") + " • Flipstax";
@@ -52,6 +53,10 @@ export function Form({ type }: FormProps) {
     e.preventDefault();
     // TODO: Implement form submission logic
     console.log("Form submitted:", formData);
+    if (isLogin) {
+    } else {
+      //Registering user
+    }
   };
 
   const handleGoogleSuccess = (credentialResponse: any) => {
@@ -98,7 +103,12 @@ export function Form({ type }: FormProps) {
 
           <Text size="sm">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <Anchor component={Link} to={isLogin ? "/register" : "/login"}>
+            <Anchor
+              component={Link}
+              to={isLogin ? "/register" : "/login"}
+              underline="never"
+              className={classes.customAnchor}
+            >
               {isLogin ? "Sign Up" : "Log In"}
             </Anchor>
           </Text>
@@ -110,19 +120,26 @@ export function Form({ type }: FormProps) {
             placeholder="Your email"
             withAsterisk
             w="80%"
-            leftSection={<i className="fa-solid fa-at" aria-hidden="true" />}
             required
           />
 
           <TextInput
             value={formData.password}
             onChange={handleInputChange("password")}
-            type="password"
+            type={passwordVisible ? "text" : "password"}
             label="Password"
             placeholder="Your password"
             withAsterisk
             w="80%"
-            leftSection={<i className="fa-solid fa-lock" aria-hidden="true" />}
+            rightSection={
+              <i
+                onClick={() => setPasswordVisible(!passwordVisible)}
+                className={`fa-regular ${
+                  passwordVisible ? "fa-eye" : "fa-eye-slash"
+                }`}
+                style={{ cursor: "pointer" }}
+              />
+            }
             required
           />
 

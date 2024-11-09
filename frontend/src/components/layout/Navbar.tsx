@@ -6,6 +6,7 @@ import {
   Grid,
   Image,
   Text,
+  Title,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
@@ -32,7 +33,7 @@ export function Navbar() {
     >
       <Grid align="center" w="100%">
         <Grid.Col span={4} display={{ base: "none", md: "block" }}>
-          <Flex justify="flex-start" align="flex-start">
+          <Flex justify="flex-start" align="center" direction="row">
             <Image
               src="/img/logo.png"
               alt="Flipstax Logo"
@@ -40,10 +41,11 @@ export function Navbar() {
               height={50}
               fit="contain"
             />
+            <Title pl={10} size="h3">Flipstax</Title>
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
-          <Flex justify="center" align="center" gap="md">
+          <Flex justify="center" align="center" gap="xl">
             <Text fw={500}>Home</Text>
             <Text fw={500}>How It Works</Text>
           </Flex>
