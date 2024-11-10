@@ -65,8 +65,8 @@ export function Form({ type }: FormProps) {
     try {
       setIsSubmitting(true);
       if (isLogin) {
-        // TODO: Implement login logic
-        await api.post("/auth/login", formData);
+        const response = await api.post("/auth/login", formData);
+        localStorage.setItem("token", response.data.token);
       } else {
         await api.post("/auth/register", formData);
       }
@@ -79,14 +79,23 @@ export function Form({ type }: FormProps) {
     }
   };
 
-  const handleGoogleSuccess = (credentialResponse: any) => {
-    console.log("Google login success:", credentialResponse);
-    // TODO: Implement Google login success handler
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const { credential } = credentialResponse;
+      const response = await api.post("/auth/google-signin", {
+        token: credential,
+      });
+      localStorage.setItem("token", response.data.token);
+      navigate("/dashboard");
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || "An error occurred";
+      showError(errorMessage);
+    }
   };
 
   const handleGoogleError = () => {
     console.error("Google login failed");
-    // TODO: Implement error handling
+    setErrorMsg("Google sign-in failed");
   };
 
   return (
