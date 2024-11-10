@@ -1,28 +1,42 @@
-import { Home } from "@/Pages/Main/Home";
 import { Login } from "@/Pages/Main/Login";
+import { Main } from "@/Pages/Main/Main";
 import { Register } from "@/Pages/Main/Register";
-import { MantineProvider, createTheme } from "@mantine/core";
-import { Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import ProtectedRoutes from "@/components/ProtectedRoutes";
+import { useAuth } from "@/context/AuthContext";
+import { Home } from "@/Pages/Dashboard/Home";
 
 function App() {
-  const theme = createTheme({
-    breakpoints: {
-      xs: "30em",
-      sm: "48em",
-      md: "64em",
-      lg: "75em",
-      xl: "80em",
-    },
-  });
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to dashboard if user is authenticated and on login/register pages
+    if (
+      currentUser &&
+      (location.pathname === "/login" || location.pathname === "/register")
+    ) {
+      navigate("/dashboard");
+    } else if (currentUser && location.pathname === "/") {
+      return;
+    } else if (currentUser) {
+      navigate("/dashboard");
+    }
+  }, [currentUser, location.pathname, navigate]);
 
   return (
-    <MantineProvider theme={theme}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </MantineProvider>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<Main />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/dashboard" element={<Home />} />
+      </Route>
+    </Routes>
   );
 }
 

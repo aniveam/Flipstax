@@ -1,4 +1,5 @@
 import { api } from "@/api";
+import { useAuth } from "@/context/AuthContext";
 import classes from "@/modules/Flipstax.module.css";
 import {
   Anchor,
@@ -13,7 +14,7 @@ import {
 } from "@mantine/core";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type FormType = "login" | "register";
 
@@ -30,7 +31,7 @@ export function Form({ type }: FormProps) {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   const { colorScheme } = useMantineColorScheme();
-  const navigate = useNavigate();
+  const { authenticateUser } = useAuth();
   const isLogin = type === "login";
 
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -64,14 +65,16 @@ export function Form({ type }: FormProps) {
 
     try {
       setIsSubmitting(true);
+      let response = null;
       if (isLogin) {
-        const response = await api.post("/auth/login", formData);
-        localStorage.setItem("token", response.data.token);
+        response = await api.post("/auth/login", formData);
       } else {
-        await api.post("/auth/register", formData);
+        response = await api.post("/auth/register", formData);
       }
-      navigate("/dashboard");
+      authenticateUser(response.data.user, response.data.token);
+      setErrorMsg(null);
     } catch (error: any) {
+      console.log(error);
       const errorMessage = error.response?.data?.error || "An error occurred";
       showError(errorMessage);
     } finally {
@@ -85,8 +88,8 @@ export function Form({ type }: FormProps) {
       const response = await api.post("/auth/google-signin", {
         token: credential,
       });
-      localStorage.setItem("token", response.data.token);
-      navigate("/dashboard");
+      authenticateUser(response.data.user, response.data.token);
+      setErrorMsg(null);
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || "An error occurred";
       showError(errorMessage);

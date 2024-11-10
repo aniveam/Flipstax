@@ -12,7 +12,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 
-export function Home() {
+export function Main() {
   const { colorScheme } = useMantineColorScheme();
   const slideVariants = {
     start: { y: 40, opacity: 0 },

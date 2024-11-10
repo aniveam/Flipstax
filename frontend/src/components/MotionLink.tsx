@@ -10,4 +10,4 @@ const button = React.forwardRef<HTMLAnchorElement, Props>((props, ref) => {
     </Button>
   );
 });
-export const MotionLink = motion(button);
+export const MotionLink = motion.create(button);

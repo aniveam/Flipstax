@@ -28,7 +28,9 @@ router.post("/register", async (req, res: Response) => {
     });
     await newUser.save();
 
-    res.status(201).send({ message: "User registered successfully!" });
+    res
+      .status(201)
+      .send({ message: "User registered successfully!", user: newUser });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: "Registration failed" });
@@ -42,7 +44,7 @@ router.post("/login", async (req, res: Response) => {
 
     if (user && bcrypt.compareSync(password, user.password || "")) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN as string);
-      res.status(200).send({ token });
+      res.status(200).send({ token, user });
     } else {
       res.status(400).send({ error: "Invalid credentials" });
     }
@@ -76,7 +78,7 @@ router.post("/google-signin", async (req, res: Response) => {
       { id: user._id },
       process.env.JWT_TOKEN as string
     );
-    res.status(200).json({ token: jwtToken });
+    res.status(200).json({ token: jwtToken, user });
   } catch (e) {
     console.log(e);
     res.status(500).send({ error: "Google Signin failed" });

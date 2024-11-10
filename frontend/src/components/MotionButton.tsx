@@ -15,4 +15,4 @@ const button = React.forwardRef<HTMLButtonElement, Props>((props, ref) => {
   );
 });
 
-export const MotionButton = motion(button);
+export const MotionButton = motion.create(button);
