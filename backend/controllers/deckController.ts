@@ -1,21 +1,49 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 import Deck from "../models/Deck";
+import Flashcard from "../models/Flashcard";
+
+const fetchDecks = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (userId) {
+      const decks = await Deck.find({ userId });
+      const decksWithFlashcardCount = await Promise.all(
+        decks.map(async (deck) => {
+          const flashcardCount = await Flashcard.countDocuments({
+            deckId: deck._id,
+          });
+          return {
+            ...deck.toObject(),
+            flashcardCount,
+          };
+        })
+      );
+      res.status(200).json({ decks: decksWithFlashcardCount });
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error: fetchDecks" });
+  }
+};
 
 const createDeck = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const { name } = req.body;
     if (userId) {
-      const newDeck = new Deck({
+      const deck = await Deck.create({
         name,
         userId,
       });
-      await newDeck.save();
+      res.status(200).send(deck);
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error: Deck" });
+    res.status(500).json({ error: "Internal Server Error: createDeck" });
   }
 };
 
-export { createDeck };
+export { createDeck, fetchDecks };

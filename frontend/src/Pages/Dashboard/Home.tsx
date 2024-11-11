@@ -1,6 +1,8 @@
 import { DeckModal } from "@/components/ui/DeckModal";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { useAuth } from "@/context/AuthContext";
+import { Decks } from "@/Pages/Dashboard/Decks";
+import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import {
   AppShell,
@@ -10,16 +12,17 @@ import {
   Group,
   Image,
   ScrollArea,
-  Skeleton,
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
+import { fetchDecks } from "../../redux/deckSlice";
 
 export function Home() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const dispatch = useAppDispatch();
   // Decks
   const [deckOpened, setDeckOpened] = useState<boolean>(false);
   const [deckMode, setDeckMode] = useState<string>("");
@@ -31,7 +34,11 @@ export function Home() {
   });
 
   useEffect(() => {
+    const fetchUserDecks = () => {
+      dispatch(fetchDecks());
+    };
     document.title = "Dashboard" + " • Flipstax";
+    fetchUserDecks();
   }, []);
 
   const toggleDeckModal = () => setDeckOpened(!deckOpened);
@@ -40,7 +47,7 @@ export function Home() {
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: 300,
+        width: 400,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
@@ -110,11 +117,7 @@ export function Home() {
           </Flex>
         </AppShell.Section>
         <AppShell.Section grow my="md" component={ScrollArea}>
-          {Array(60)
-            .fill(0)
-            .map((_, index) => (
-              <Skeleton key={index} h={28} mt="sm" animate={false} />
-            ))}
+          <Decks setDeck={setDeck} />
         </AppShell.Section>
       </AppShell.Navbar>
       <AppShell.Main>Main</AppShell.Main>

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 interface Deck {
-  id: string;
+  _id: string;
   name: string;
   userId: ObjectId;
   createdAt: Date;

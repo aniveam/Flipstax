@@ -29,7 +29,7 @@ export function DeckModal({
   const getTitle = () => {
     switch (mode) {
       case "create":
-        return "Name your new deck";
+        return "Create deck";
       case "edit":
         return "Edit deck";
       case "delete":
@@ -53,8 +53,9 @@ export function DeckModal({
         <Flex direction="column" gap="md">
           <TextInput
             onChange={(e) => setNewDeckName(e.target.value)}
-            label="Deck name"
+            label="Name your new deck"
             placeholder="Your deck name"
+            required
           />
           <Flex justify="flex-end">
             <Button

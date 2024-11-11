@@ -14,6 +14,14 @@ const initialState: DeckState = {
   error: null,
 };
 
+export const fetchDecks = createAsyncThunk<Deck[]>(
+  "decks/fetchDecks",
+  async () => {
+    const response = await api.get("/decks");
+    return response.data.decks;
+  }
+);
+
 export const createDeck = createAsyncThunk<Deck, { name: string }>(
   "decks/create",
   async ({ name }) => {
@@ -31,7 +39,7 @@ const deckSlice = createSlice({
       action: PayloadAction<{ deckId: string; incrementBy: number }>
     ) => {
       const { deckId, incrementBy } = action.payload;
-      const deck = state.decks.find((d) => d.id === deckId);
+      const deck = state.decks.find((d) => d._id === deckId);
       if (deck) {
         deck.flashcardCount += incrementBy;
       }
@@ -39,6 +47,26 @@ const deckSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Handle fetchDecks actions
+      .addCase(fetchDecks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDecks.fulfilled, (state, action: PayloadAction<Deck[]>) => {
+        state.loading = false;
+        state.decks = action.payload.sort((a, b) => {
+          if (b.pinned !== a.pinned) {
+            return b.pinned ? 1 : -1;
+          }
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
+      })
+      .addCase(fetchDecks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch decks";
+      })
       // Handle createDeck actions
       .addCase(createDeck.pending, (state) => {
         state.loading = true;
@@ -46,6 +74,7 @@ const deckSlice = createSlice({
       })
       .addCase(createDeck.fulfilled, (state, action: PayloadAction<Deck>) => {
         state.loading = false;
+        action.payload.flashcardCount = 0;
         state.decks = [action.payload, ...state.decks];
       })
       .addCase(createDeck.rejected, (state, action) => {
