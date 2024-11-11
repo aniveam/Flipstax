@@ -3,6 +3,6 @@ export default interface User {
   email: string;
   password?: string;
   googleId?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

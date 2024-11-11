@@ -1,8 +1,11 @@
-import { MotionButton } from "@/components/MotionButton";
+import { DeckModal } from "@/components/ui/DeckModal";
+import { MotionButton } from "@/components/ui/MotionButton";
 import { useAuth } from "@/context/AuthContext";
+import Deck from "@/types/Deck";
 import {
   AppShell,
   Burger,
+  Button,
   Flex,
   Group,
   Image,
@@ -12,11 +15,15 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function Home() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  // Decks
+  const [deckOpened, setDeckOpened] = useState<boolean>(false);
+  const [deckMode, setDeckMode] = useState<string>("");
+  const [deck, setDeck] = useState<Deck | null>(null);
 
   const { signOut } = useAuth();
   const { toggleColorScheme } = useMantineColorScheme({
@@ -26,6 +33,8 @@ export function Home() {
   useEffect(() => {
     document.title = "Dashboard" + " • Flipstax";
   }, []);
+
+  const toggleDeckModal = () => setDeckOpened(!deckOpened);
 
   return (
     <AppShell
@@ -84,20 +93,39 @@ export function Home() {
         </Flex>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <AppShell.Section>Navbar header</AppShell.Section>
+        <AppShell.Section>
+          <Flex justify="space-between" align="center">
+            <Title size="md">Your decks</Title>
+            <Button
+              onClick={() => {
+                setDeckOpened(true);
+                setDeckMode("create");
+              }}
+              size="xs"
+              radius="xl"
+              color="cyan"
+            >
+              Create deck
+            </Button>
+          </Flex>
+        </AppShell.Section>
         <AppShell.Section grow my="md" component={ScrollArea}>
-          60 links in a scrollable section
           {Array(60)
             .fill(0)
             .map((_, index) => (
               <Skeleton key={index} h={28} mt="sm" animate={false} />
             ))}
         </AppShell.Section>
-        <AppShell.Section>
-          Navbar footer – always at the bottom
-        </AppShell.Section>
       </AppShell.Navbar>
       <AppShell.Main>Main</AppShell.Main>
+
+      {/* Modals */}
+      <DeckModal
+        deck={deck}
+        mode={deckMode}
+        toggleDeckModal={toggleDeckModal}
+        deckOpened={deckOpened}
+      />
     </AppShell>
   );
 }

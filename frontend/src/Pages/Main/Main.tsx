@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar";
-import { MotionLink } from "@/components/MotionLink";
+import { MotionLink } from "@/components/ui/MotionLink";
 import { motion } from "framer-motion";
 
 import {

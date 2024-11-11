@@ -1,5 +1,5 @@
-import { MotionButton } from "@/components/MotionButton";
-import { MotionLink } from "@/components/MotionLink";
+import { MotionButton } from "@/components/ui/MotionButton";
+import { MotionLink } from "@/components/ui/MotionLink";
 import {
   Box,
   Flex,
@@ -41,7 +41,9 @@ export function Navbar() {
               height={50}
               fit="contain"
             />
-            <Title pl={10} size="h3">Flipstax</Title>
+            <Title pl={10} size="h3">
+              Flipstax
+            </Title>
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4 }}>
