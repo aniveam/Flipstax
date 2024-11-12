@@ -35,6 +35,8 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
         setDeckMode("delete");
         toggleDeckModal();
         break;
+      case "pin":
+        break;
       default:
         navigate(`/dashboard/${deck._id}`);
     }
@@ -68,7 +70,7 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
                 mb="xs"
                 align="flex-start"
               >
-                <Text fw={600} size="md" w="60%">
+                <Text fw={600} size="md" w="70%">
                   {deck.name}
                 </Text>
                 <Group gap="xs" ml="auto" w="auto">
@@ -78,12 +80,13 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <ActionIcon color={val[1]} size="xs" variant="light">
-                        <i
-                          onClick={(e) => handleDeckClick(deck, key, e)}
-                          className={val[0]}
-                          style={{ fontSize: "12px" }}
-                        ></i>
+                      <ActionIcon
+                        onClick={(e) => handleDeckClick(deck, key, e)}
+                        color={val[1]}
+                        size="xs"
+                        variant="light"
+                      >
+                        <i className={val[0]} style={{ fontSize: "12px" }}></i>
                       </ActionIcon>
                     </motion.div>
                   ))}

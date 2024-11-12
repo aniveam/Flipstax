@@ -18,13 +18,15 @@ export function DeckModal({
   deckOpened,
 }: DeckModalProps) {
   const dispatch = useAppDispatch();
-  const [newDeckName, setNewDeckName] = useState<string>("");
+  const [deckName, setDeckName] = useState<string>("");
 
   useEffect(() => {
-    if (deck) {
-      setNewDeckName(deck.name);
+    if (mode === "create") {
+      setDeckName("");
+    } else if (mode === "edit" && deck) {
+      setDeckName(deck.name);
     }
-  }, [deck]);
+  }, [deck, mode]);
 
   const getTitle = () => {
     switch (mode) {
@@ -41,7 +43,7 @@ export function DeckModal({
 
   const handleSubmit = () => {
     if (mode === "create") {
-      dispatch(createDeck({ name: newDeckName }));
+      dispatch(createDeck({ name: deckName }));
     }
     if (deck) {
       if (mode === "delete") {
@@ -49,7 +51,7 @@ export function DeckModal({
       } else if (mode === "edit") {
       }
     }
-    setNewDeckName("");
+    setDeckName("");
     toggleDeckModal();
   };
 
@@ -76,7 +78,8 @@ export function DeckModal({
     } else {
       return (
         <TextInput
-          onChange={(e) => setNewDeckName(e.target.value)}
+          value={deckName}
+          onChange={(e) => setDeckName(e.target.value)}
           label="Name your new deck"
           placeholder="Your deck name"
           required
@@ -105,7 +108,7 @@ export function DeckModal({
               variant="filled"
               radius="xl"
               size="xs"
-              color="cyan"
+              color={mode === "delete" ? "red" : "cyan"}
             >
               {getConfirmButtonText()}
             </Button>
