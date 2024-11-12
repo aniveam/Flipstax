@@ -46,6 +46,32 @@ const createDeck = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
+const editDeck = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { deckId, name, pinned } = req.body;
+
+    if (userId) {
+      const deck = await Deck.findOneAndUpdate(
+        { _id: deckId },
+        { name, pinned },
+        { new: true } // This ensures the updated deck is returned
+      );
+      if (deck) {
+        const flashcardCount = await Flashcard.countDocuments({
+          deckId: deck._id,
+        });
+
+        res.status(200).json({ deck, flashcardCount });
+      }
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error: editDeck" });
+  }
+};
+
 const deleteDeck = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -61,4 +87,4 @@ const deleteDeck = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export { createDeck, deleteDeck, fetchDecks };
+export { createDeck, deleteDeck, editDeck, fetchDecks };

@@ -30,6 +30,18 @@ export const createDeck = createAsyncThunk<Deck, { name: string }>(
   }
 );
 
+export const editDeck = createAsyncThunk<
+  { deck: Deck; flashcardCount: number },
+  { _id: string; name: string; pinnedStatus: boolean }
+>("decks/editDeck", async ({ _id, name, pinnedStatus }) => {
+  const response = await api.put("/decks", {
+    deckId: _id,
+    name,
+    pinned: pinnedStatus,
+  });
+  return response.data;
+});
+
 export const deleteDeck = createAsyncThunk<Deck, { _id: string }>(
   "decks/delete",
   async ({ _id }) => {
@@ -88,6 +100,44 @@ const deckSlice = createSlice({
       .addCase(createDeck.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to create deck";
+      })
+      // Handle editDeck actions
+      .addCase(editDeck.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        editDeck.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ deck: Deck; flashcardCount: number }>
+        ) => {
+          state.loading = false;
+          const index = state.decks.findIndex(
+            (deck) => deck._id === action.payload.deck._id
+          );
+          if (index !== -1) {
+            state.decks[index] = {
+              ...action.payload.deck,
+              flashcardCount: action.payload.flashcardCount
+            };
+          }
+          state.decks.sort((a, b) => {
+            if (b.pinned !== a.pinned) {
+              return b.pinned ? 1 : -1;
+            }
+            if (b.pinned !== a.pinned) {
+              return b.pinned ? 1 : -1;
+            }
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        }
+      )
+      .addCase(editDeck.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to edit deck";
       })
       // Handle deleteDeck actions
       .addCase(deleteDeck.pending, (state) => {

@@ -41,7 +41,7 @@ export function Navbar() {
               height={50}
               fit="contain"
             />
-            <Title pl={10} size="h3">
+            <Title pl={10} size="h2">
               Flipstax
             </Title>
           </Flex>

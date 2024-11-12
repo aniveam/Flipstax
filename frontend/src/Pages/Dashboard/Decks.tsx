@@ -1,4 +1,5 @@
-import { useAppSelector } from "@/redux/hooks";
+import { editDeck } from "@/redux/deckSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import { ActionIcon, Card, Flex, Group, Text } from "@mantine/core";
 import { motion } from "framer-motion";
@@ -15,9 +16,10 @@ interface DeckProps {
 export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
   const { decks } = useAppSelector((state) => state.decks);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const icons = {
-    pin: ["fa-solid fa-thumbtack", "blue"],
+    pin: ["fa-solid fa-thumbtack", "blue", "yellow"],
     edit: ["fa fa-pencil-square-o", "green"],
     delete: ["fa fa-trash-o", "red"],
   };
@@ -36,6 +38,13 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
         toggleDeckModal();
         break;
       case "pin":
+        dispatch(
+          editDeck({
+            _id: deck._id,
+            name: deck.name,
+            pinnedStatus: !deck.pinned,
+          })
+        );
         break;
       default:
         navigate(`/dashboard/${deck._id}`);
@@ -82,7 +91,7 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
                     >
                       <ActionIcon
                         onClick={(e) => handleDeckClick(deck, key, e)}
-                        color={val[1]}
+                        color={key === "pin" && deck.pinned ? val[2] : val[1]}
                         size="xs"
                         variant="light"
                       >

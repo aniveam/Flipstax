@@ -1,4 +1,4 @@
-import { createDeck, deleteDeck } from "@/redux/deckSlice";
+import { createDeck, deleteDeck, editDeck } from "@/redux/deckSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import { Button, Flex, Modal, Text, TextInput } from "@mantine/core";
@@ -49,6 +49,9 @@ export function DeckModal({
       if (mode === "delete") {
         dispatch(deleteDeck({ _id: deck._id }));
       } else if (mode === "edit") {
+        dispatch(
+          editDeck({ _id: deck._id, name: deckName, pinnedStatus: deck.pinned })
+        );
       }
     }
     setDeckName("");
@@ -80,7 +83,7 @@ export function DeckModal({
         <TextInput
           value={deckName}
           onChange={(e) => setDeckName(e.target.value)}
-          label="Name your new deck"
+          label="Enter deck name"
           placeholder="Your deck name"
           required
         />
