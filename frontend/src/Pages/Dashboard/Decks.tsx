@@ -2,13 +2,43 @@ import { useAppSelector } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import { ActionIcon, Card, Flex, Group, Text } from "@mantine/core";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface DeckProps {
   setDeck: React.Dispatch<React.SetStateAction<Deck | null>>;
+  setDeckMode: React.Dispatch<
+    React.SetStateAction<"create" | "edit" | "delete" | "">
+  >;
+  toggleDeckModal: () => void;
 }
 
-export function Decks({ setDeck }: DeckProps) {
+export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
   const { decks } = useAppSelector((state) => state.decks);
+  const navigate = useNavigate();
+
+  const icons = {
+    pin: ["fa-solid fa-thumbtack", "blue"],
+    edit: ["fa fa-pencil-square-o", "green"],
+    delete: ["fa fa-trash-o", "red"],
+  };
+
+  const handleDeckClick = (deck: Deck, mode: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeck(deck);
+
+    switch (mode) {
+      case "edit":
+        setDeckMode("edit");
+        toggleDeckModal();
+        break;
+      case "delete":
+        setDeckMode("delete");
+        toggleDeckModal();
+        break;
+      default:
+        navigate(`/dashboard/${deck._id}`);
+    }
+  };
 
   return (
     <>
@@ -28,7 +58,7 @@ export function Decks({ setDeck }: DeckProps) {
               padding="lg"
               radius="md"
               withBorder
-              onClick={() => setDeck(deck)}
+              onClick={(e) => handleDeckClick(deck, "deck", e)}
               bg="var(--mantine-color-blue-light)"
               data-dark-bg="var(--mantine-color-dark-8)"
             >
@@ -42,15 +72,21 @@ export function Decks({ setDeck }: DeckProps) {
                   {deck.name}
                 </Text>
                 <Group gap="xs" ml="auto" w="auto">
-                  <ActionIcon color="blue" size="xs" variant="light">
-                    <i className="fa-solid fa-thumbtack"></i>
-                  </ActionIcon>
-                  <ActionIcon color="green" size="xs" variant="light">
-                    <i className="fa fa-pencil-square-o"></i>
-                  </ActionIcon>
-                  <ActionIcon color="red" size="xs" variant="light">
-                    <i className="fa fa-trash-o"></i>
-                  </ActionIcon>
+                  {Object.entries(icons).map(([key, val]) => (
+                    <motion.div
+                      key={key}
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ActionIcon color={val[1]} size="xs" variant="light">
+                        <i
+                          onClick={(e) => handleDeckClick(deck, key, e)}
+                          className={val[0]}
+                          style={{ fontSize: "12px" }}
+                        ></i>
+                      </ActionIcon>
+                    </motion.div>
+                  ))}
                 </Group>
               </Group>
               <Text size="sm" c="dimmed">

@@ -18,10 +18,6 @@ function App() {
       (location.pathname === "/login" || location.pathname === "/register")
     ) {
       navigate("/dashboard");
-    } else if (currentUser && location.pathname === "/") {
-      return;
-    } else if (currentUser) {
-      navigate("/dashboard");
     }
   }, [currentUser, location.pathname, navigate]);
 
@@ -34,7 +30,7 @@ function App() {
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoutes />}>
-        <Route path="/dashboard" element={<Home />} />
+        <Route path="/dashboard/:deckId?" element={<Home />} />
       </Route>
     </Routes>
   );

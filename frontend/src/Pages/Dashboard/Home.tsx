@@ -25,7 +25,9 @@ export function Home() {
   const dispatch = useAppDispatch();
   // Decks
   const [deckOpened, setDeckOpened] = useState<boolean>(false);
-  const [deckMode, setDeckMode] = useState<string>("");
+  const [deckMode, setDeckMode] = useState<"create" | "edit" | "delete" | "">(
+    ""
+  );
   const [deck, setDeck] = useState<Deck | null>(null);
 
   const { signOut } = useAuth();
@@ -117,7 +119,7 @@ export function Home() {
           </Flex>
         </AppShell.Section>
         <AppShell.Section grow my="md" component={ScrollArea}>
-          <Decks setDeck={setDeck} />
+          <Decks setDeck={setDeck} setDeckMode={setDeckMode} toggleDeckModal={toggleDeckModal} />
         </AppShell.Section>
       </AppShell.Navbar>
       <AppShell.Main>Main</AppShell.Main>

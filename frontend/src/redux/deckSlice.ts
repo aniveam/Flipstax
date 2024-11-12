@@ -30,6 +30,14 @@ export const createDeck = createAsyncThunk<Deck, { name: string }>(
   }
 );
 
+export const deleteDeck = createAsyncThunk<Deck, { _id: string }>(
+  "decks/delete",
+  async ({ _id }) => {
+    const response = await api.delete("/decks", { data: { deckId: _id } });
+    return response.data;
+  }
+);
+
 const deckSlice = createSlice({
   name: "decks",
   initialState,
@@ -78,6 +86,21 @@ const deckSlice = createSlice({
         state.decks = [action.payload, ...state.decks];
       })
       .addCase(createDeck.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create deck";
+      })
+      // Handle deleteDeck actions
+      .addCase(deleteDeck.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteDeck.fulfilled, (state, action: PayloadAction<Deck>) => {
+        state.loading = false;
+        state.decks = state.decks.filter(
+          (deck) => deck._id != action.payload._id
+        );
+      })
+      .addCase(deleteDeck.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to delete deck";
       });

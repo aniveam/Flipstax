@@ -37,7 +37,7 @@ const createDeck = async (req: AuthenticatedRequest, res: Response) => {
         name,
         userId,
       });
-      res.status(200).send(deck);
+      res.status(200).json(deck);
     } else {
       res.status(400).json({ error: "User not authenticated" });
     }
@@ -46,4 +46,19 @@ const createDeck = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export { createDeck, fetchDecks };
+const deleteDeck = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (userId) {
+      const { deckId } = req.body;
+      const deck = await Deck.findByIdAndDelete({ _id: deckId });
+      res.status(200).json(deck);
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error: deleteDeck" });
+  }
+};
+
+export { createDeck, deleteDeck, fetchDecks };
