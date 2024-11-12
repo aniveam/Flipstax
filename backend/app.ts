@@ -4,6 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth";
 import deckRoutes from "./routes/deck";
+import flashcardRoutes from "./routes/flashcard";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/decks", deckRoutes);
+app.use("/api/flashcards", flashcardRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI as string)

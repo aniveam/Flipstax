@@ -19,9 +19,7 @@ const deckSchema: Schema<IDeck> = new Schema(
     },
     pinned: { type: Boolean, default: false },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Deck = mongoose.model("Deck", deckSchema);

@@ -52,62 +52,60 @@ export function Decks({ setDeck, setDeckMode, toggleDeckModal }: DeckProps) {
   };
 
   return (
-    <>
-      <Flex direction="column" gap="md" m={5}>
-        {decks.map((deck) => (
-          <motion.div
-            key={deck._id}
-            whileHover={{
-              scale: 1.03,
-              y: -3,
-              transition: { duration: 0.3 },
-            }}
-            style={{ cursor: "pointer" }}
+    <Flex direction="column" gap="md" m={5}>
+      {decks.map((deck) => (
+        <motion.div
+          key={deck._id}
+          whileHover={{
+            scale: 1.03,
+            y: -3,
+            transition: { duration: 0.3 },
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <Card
+            shadow="lg"
+            padding="lg"
+            radius="md"
+            withBorder
+            onClick={(e) => handleDeckClick(deck, "deck", e)}
+            bg="var(--mantine-color-blue-light)"
+            data-dark-bg="var(--mantine-color-dark-8)"
           >
-            <Card
-              shadow="lg"
-              padding="lg"
-              radius="md"
-              withBorder
-              onClick={(e) => handleDeckClick(deck, "deck", e)}
-              bg="var(--mantine-color-blue-light)"
-              data-dark-bg="var(--mantine-color-dark-8)"
+            <Group
+              justify="space-between"
+              wrap="nowrap"
+              mb="xs"
+              align="flex-start"
             >
-              <Group
-                justify="space-between"
-                wrap="nowrap"
-                mb="xs"
-                align="flex-start"
-              >
-                <Text fw={600} size="md" w="70%">
-                  {deck.name}
-                </Text>
-                <Group gap="xs" ml="auto" w="auto">
-                  {Object.entries(icons).map(([key, val]) => (
-                    <motion.div
-                      key={key}
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <ActionIcon
-                        onClick={(e) => handleDeckClick(deck, key, e)}
-                        color={key === "pin" && deck.pinned ? val[2] : val[1]}
-                        size="xs"
-                        variant="light"
-                      >
-                        <i className={val[0]} style={{ fontSize: "12px" }}></i>
-                      </ActionIcon>
-                    </motion.div>
-                  ))}
-                </Group>
-              </Group>
-              <Text size="sm" c="dimmed">
-                {deck.flashcardCount} flashcards
+              <Text fw={600} size="md" w="70%">
+                {deck.name}
               </Text>
-            </Card>
-          </motion.div>
-        ))}
-      </Flex>
-    </>
+              <Group gap={5} ml="auto" w="auto">
+                {Object.entries(icons).map(([key, val]) => (
+                  <motion.div
+                    key={key}
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ActionIcon
+                      onClick={(e) => handleDeckClick(deck, key, e)}
+                      color={key === "pin" && deck.pinned ? val[2] : val[1]}
+                      size="sm"
+                      variant="light"
+                    >
+                      <i className={val[0]} style={{ fontSize: "12px" }}></i>
+                    </ActionIcon>
+                  </motion.div>
+                ))}
+              </Group>
+            </Group>
+            <Text size="sm" c="dimmed">
+              {deck.flashcardCount} flashcards
+            </Text>
+          </Card>
+        </motion.div>
+      ))}
+    </Flex>
   );
 }

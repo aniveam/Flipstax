@@ -92,32 +92,30 @@ export function DeckModal({
   };
 
   return (
-    <>
-      <Modal opened={deckOpened} onClose={toggleDeckModal} title={getTitle()}>
-        <Flex direction="column" gap="md">
-          {getModalBody()}
-          <Flex justify="flex-end" gap="xs">
-            <Button
-              onClick={toggleDeckModal}
-              variant="filled"
-              radius="xl"
-              size="xs"
-              color="gray"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              variant="filled"
-              radius="xl"
-              size="xs"
-              color={mode === "delete" ? "red" : "cyan"}
-            >
-              {getConfirmButtonText()}
-            </Button>
-          </Flex>
+    <Modal opened={deckOpened} onClose={toggleDeckModal} title={getTitle()}>
+      <Flex direction="column" gap="md">
+        {getModalBody()}
+        <Flex justify="flex-end" gap="xs">
+          <Button
+            onClick={toggleDeckModal}
+            variant="filled"
+            radius="xl"
+            size="xs"
+            color="gray"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="filled"
+            radius="xl"
+            size="xs"
+            color={mode === "delete" ? "red" : "cyan"}
+          >
+            {getConfirmButtonText()}
+          </Button>
         </Flex>
-      </Modal>
-    </>
+      </Flex>
+    </Modal>
   );
 }

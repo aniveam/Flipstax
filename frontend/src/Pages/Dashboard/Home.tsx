@@ -1,9 +1,13 @@
 import { DeckModal } from "@/components/ui/DeckModal";
+import { FlashcardModal } from "@/components/ui/FlashcardModal";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { useAuth } from "@/context/AuthContext";
 import { Decks } from "@/Pages/Dashboard/Decks";
+import { Flashcards } from "@/Pages/Dashboard/Flashcards";
+import { fetchDecks } from "@/redux/deckSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
+import Flashcard from "@/types/Flashcard";
 import {
   ActionIcon,
   AppShell,
@@ -19,7 +23,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchDecks } from "../../redux/deckSlice";
 
 export function Home() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -30,10 +33,20 @@ export function Home() {
 
   // Decks
   const [deckOpened, setDeckOpened] = useState<boolean>(false);
+  const toggleDeckModal = () => setDeckOpened(!deckOpened);
   const [deckMode, setDeckMode] = useState<"create" | "edit" | "delete" | "">(
     ""
   );
   const [deck, setDeck] = useState<Deck | null>(null);
+
+  //Flashcards
+  const flashcards = useAppDispatch();
+  const [flashcardOpened, setFlashcardOpened] = useState<boolean>(false);
+  const toggleFlashcardModal = () => setFlashcardOpened(!flashcardOpened);
+  const [flashcardMode, setFlashcardMode] = useState<
+    "create" | "edit" | "delete" | ""
+  >("");
+  const [flashcard, setFlashcard] = useState<Flashcard | null>(null);
 
   const { signOut } = useAuth();
   const { toggleColorScheme } = useMantineColorScheme({
@@ -46,9 +59,7 @@ export function Home() {
     };
     document.title = "Dashboard" + " • Flipstax";
     fetchUserDecks();
-  }, []);
-
-  const toggleDeckModal = () => setDeckOpened(!deckOpened);
+  }, [flashcards.length]);
 
   return (
     <AppShell
@@ -107,27 +118,46 @@ export function Home() {
         </Flex>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        {deckId && deck ? (
-          <AppShell.Section>
-            <Flex justify="space-between" align="center">
-              <Flex
-                onClick={() => navigate("/dashboard")}
-                direction="row"
-                align="center"
-                gap="xs"
-                style={{ cursor: "pointer" }}
-                maw="60%"
-              >
-                <ActionIcon variant="subtle">
-                  <i className="fa-solid fa-arrow-left"></i>
-                </ActionIcon>
-                <Title size="md">{deck.name}</Title>
+        {deckId ? (
+          <>
+            <AppShell.Section>
+              <Flex justify="space-between" align="center">
+                <Flex
+                  onClick={() => navigate("/dashboard")}
+                  direction="row"
+                  align="center"
+                  gap="xs"
+                  style={{ cursor: "pointer" }}
+                  maw="60%"
+                >
+                  <ActionIcon variant="subtle">
+                    <i className="fa-solid fa-arrow-left"></i>
+                  </ActionIcon>
+                  <Title size="md">{deck?.name}</Title>
+                </Flex>
+                <Button
+                  onClick={() => {
+                    setFlashcardOpened(true);
+                    setFlashcardMode("create");
+                  }}
+                  size="xs"
+                  radius="xl"
+                  color="cyan"
+                >
+                  Create flashcard
+                </Button>
               </Flex>
-              <Button size="xs" radius="xl" color="cyan">
-                Create flashcard
-              </Button>
-            </Flex>
-          </AppShell.Section>
+            </AppShell.Section>
+            <AppShell.Section grow my="md" component={ScrollArea}>
+              <Flashcards
+                deckId={deckId}
+                deck={deck}
+                setFlashcard={setFlashcard}
+                setFlashcardMode={setFlashcardMode}
+                toggleFlashcardModal={toggleFlashcardModal}
+              />
+            </AppShell.Section>
+          </>
         ) : (
           <>
             <AppShell.Section>
@@ -164,6 +194,13 @@ export function Home() {
         mode={deckMode}
         toggleDeckModal={toggleDeckModal}
         deckOpened={deckOpened}
+      />
+      <FlashcardModal
+        deckId={deckId}
+        flashcard={flashcard}
+        mode={flashcardMode}
+        toggleFlashcardModal={toggleFlashcardModal}
+        flashcardOpened={flashcardOpened}
       />
     </AppShell>
   );
