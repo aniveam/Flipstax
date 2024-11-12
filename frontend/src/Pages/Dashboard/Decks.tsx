@@ -1,4 +1,4 @@
-import { editDeck } from "@/redux/deckSlice";
+import { editDeck, updateSelectedDeck } from "@/redux/deckSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import {
@@ -17,7 +17,6 @@ import { SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface DeckProps {
-  setDeck: React.Dispatch<React.SetStateAction<Deck | null>>;
   setDeckMode: React.Dispatch<
     React.SetStateAction<"create" | "edit" | "delete" | "">
   >;
@@ -26,7 +25,6 @@ interface DeckProps {
 }
 
 export function Decks({
-  setDeck,
   setDeckMode,
   setDeckOpened,
   toggleDeckModal,
@@ -43,7 +41,7 @@ export function Decks({
 
   const handleDeckClick = (deck: Deck, mode: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setDeck(deck);
+    dispatch(updateSelectedDeck({ deck }));
 
     switch (mode) {
       case "edit":
@@ -88,7 +86,7 @@ export function Decks({
       </AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         <Flex direction="column" gap="md" m={5}>
-          {decks.map((deck) => (
+          {decks.map((deck: Deck) => (
             <motion.div
               key={deck._id}
               whileHover={{

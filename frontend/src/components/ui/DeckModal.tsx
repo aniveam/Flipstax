@@ -1,6 +1,5 @@
 import { createDeck, deleteDeck, editDeck } from "@/redux/deckSlice";
-import { useAppDispatch } from "@/redux/hooks";
-import Deck from "@/types/Deck";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   Button,
   Flex,
@@ -12,14 +11,12 @@ import {
 import { useEffect, useState } from "react";
 
 interface DeckModalProps {
-  deck: Deck | null;
   mode: string;
   toggleDeckModal: () => void;
   deckOpened: boolean;
 }
 
 export function DeckModal({
-  deck,
   mode,
   toggleDeckModal,
   deckOpened,
@@ -27,14 +24,15 @@ export function DeckModal({
   const dispatch = useAppDispatch();
   const [deckName, setDeckName] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { selectedDeck } = useAppSelector((state) => state.decks);
 
   useEffect(() => {
     if (mode === "create") {
       setDeckName("");
-    } else if (mode === "edit" && deck) {
-      setDeckName(deck.name);
+    } else if (mode === "edit" && selectedDeck) {
+      setDeckName(selectedDeck.name);
     }
-  }, [deck, mode]);
+  }, [selectedDeck, mode]);
 
   const getTitle = () => {
     switch (mode) {
@@ -57,12 +55,16 @@ export function DeckModal({
       }
       dispatch(createDeck({ name: deckName }));
     }
-    if (deck) {
+    if (selectedDeck) {
       if (mode === "delete") {
-        dispatch(deleteDeck({ _id: deck._id }));
+        dispatch(deleteDeck({ _id: selectedDeck._id }));
       } else if (mode === "edit") {
         dispatch(
-          editDeck({ _id: deck._id, name: deckName, pinnedStatus: deck.pinned })
+          editDeck({
+            _id: selectedDeck._id,
+            name: deckName,
+            pinnedStatus: selectedDeck.pinned,
+          })
         );
       }
     }

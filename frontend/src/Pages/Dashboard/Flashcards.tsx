@@ -36,8 +36,8 @@ export function Flashcards({
 }: FlashcardProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { deckName } = useAppSelector((state) => state.flashcards);
   const { flashcards } = useAppSelector((state) => state.flashcards);
+  const { selectedDeck } = useAppSelector((state) => state.decks);
 
   useEffect(() => {
     dispatch(fetchFlashcards({ deckId }));
@@ -88,7 +88,7 @@ export function Flashcards({
             <ActionIcon variant="subtle">
               <i className="fa-solid fa-arrow-left"></i>
             </ActionIcon>
-            <Title size="md">{deckName}</Title>
+            <Title size="md">{selectedDeck?.name}</Title>
           </Flex>
           <Button
             onClick={() => {
@@ -105,7 +105,7 @@ export function Flashcards({
       </AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         <Flex direction="column" gap="md" m={5}>
-          {flashcards.map((flashcard) => (
+          {flashcards.map((flashcard: Flashcard) => (
             <motion.div
               onClick={(e) => handleFlashcardClick("edit", flashcard, e)}
               key={flashcard._id}

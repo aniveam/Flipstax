@@ -1,11 +1,12 @@
 import App from "@/App.tsx";
-import { store } from "@/redux/store.ts";
+import { persistor, store } from "@/redux/store.ts";
 import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
+import { PersistGate } from "redux-persist/integration/react";
 import { AuthProvider } from "./context/AuthContext.tsx";
 
 const theme = createTheme({
@@ -23,9 +24,11 @@ createRoot(document.getElementById("root")!).render(
     <MantineProvider theme={theme}>
       <BrowserRouter>
         <Provider store={store}>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
+          <PersistGate loading={null} persistor={persistor}>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </PersistGate>
         </Provider>
       </BrowserRouter>
     </MantineProvider>

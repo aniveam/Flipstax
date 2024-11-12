@@ -6,7 +6,6 @@ import { Decks } from "@/Pages/Dashboard/Decks";
 import { Flashcards } from "@/Pages/Dashboard/Flashcards";
 import { fetchDecks } from "@/redux/deckSlice";
 import { useAppDispatch } from "@/redux/hooks";
-import Deck from "@/types/Deck";
 import Flashcard from "@/types/Flashcard";
 import {
   AppShell,
@@ -37,7 +36,6 @@ export function Home() {
   const [deckMode, setDeckMode] = useState<"create" | "edit" | "delete" | "">(
     ""
   );
-  const [deck, setDeck] = useState<Deck | null>(null);
 
   //Flashcards
   const flashcards = useAppDispatch();
@@ -123,7 +121,6 @@ export function Home() {
           />
         ) : (
           <Decks
-            setDeck={setDeck}
             setDeckMode={setDeckMode}
             setDeckOpened={setDeckOpened}
             toggleDeckModal={toggleDeckModal}
@@ -134,7 +131,6 @@ export function Home() {
 
       {/* Modals */}
       <DeckModal
-        deck={deck}
         mode={deckMode}
         toggleDeckModal={toggleDeckModal}
         deckOpened={deckOpened}

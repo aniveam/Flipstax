@@ -4,12 +4,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DeckState {
   decks: Deck[];
+  selectedDeck: Deck | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: DeckState = {
   decks: [],
+  selectedDeck: null,
   loading: false,
   error: null,
 };
@@ -63,6 +65,10 @@ const deckSlice = createSlice({
       if (deck) {
         deck.flashcardCount += incrementBy;
       }
+    },
+    updateSelectedDeck: (state, action: PayloadAction<{ deck: Deck }>) => {
+      const { deck } = action.payload;
+      state.selectedDeck = deck;
     },
   },
   extraReducers: (builder) => {
@@ -170,5 +176,5 @@ const deckSlice = createSlice({
   },
 });
 
-export const { updateFlashcardCount } = deckSlice.actions;
+export const { updateFlashcardCount, updateSelectedDeck } = deckSlice.actions;
 export default deckSlice.reducer;
