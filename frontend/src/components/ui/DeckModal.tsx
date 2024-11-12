@@ -1,7 +1,14 @@
 import { createDeck, deleteDeck, editDeck } from "@/redux/deckSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
-import { Button, Flex, Modal, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Flex,
+  Modal,
+  Notification,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 
 interface DeckModalProps {
@@ -19,6 +26,7 @@ export function DeckModal({
 }: DeckModalProps) {
   const dispatch = useAppDispatch();
   const [deckName, setDeckName] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (mode === "create") {
@@ -43,6 +51,10 @@ export function DeckModal({
 
   const handleSubmit = () => {
     if (mode === "create") {
+      if (!deckName.trim()) {
+        setErrorMsg("You must have a deck name");
+        return;
+      }
       dispatch(createDeck({ name: deckName }));
     }
     if (deck) {
@@ -56,6 +68,7 @@ export function DeckModal({
     }
     setDeckName("");
     toggleDeckModal();
+    setErrorMsg(null);
   };
 
   const getConfirmButtonText = () => {
@@ -93,6 +106,17 @@ export function DeckModal({
 
   return (
     <Modal opened={deckOpened} onClose={toggleDeckModal} title={getTitle()}>
+      {errorMsg && (
+        <Notification
+          my={5}
+          withBorder
+          color="red"
+          title="Oops!"
+          onClose={() => setErrorMsg(null)}
+        >
+          {errorMsg}
+        </Notification>
+      )}
       <Flex direction="column" gap="md">
         {getModalBody()}
         <Flex justify="flex-end" gap="xs">

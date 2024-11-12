@@ -7,6 +7,7 @@ import {
   Button,
   Flex,
   Image,
+  Notification,
   Text,
   TextInput,
   Title,
@@ -56,7 +57,6 @@ export function Form({ type }: FormProps) {
 
   const showError = (message: string) => {
     setErrorMsg(message);
-    setTimeout(() => setErrorMsg(null), 3000);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +104,17 @@ export function Form({ type }: FormProps) {
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       <Flex align="center" justify="center" direction="column">
-        {errorMsg && <Text c="red">{errorMsg}</Text>}
+        {errorMsg && (
+          <Notification
+            my={5}
+            withBorder
+            color="red"
+            title="Oops!"
+            onClose={() => setErrorMsg(null)}
+          >
+            {errorMsg}
+          </Notification>
+        )}
         <Box
           component="form"
           onSubmit={handleSubmit}

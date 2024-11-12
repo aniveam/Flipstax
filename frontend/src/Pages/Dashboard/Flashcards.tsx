@@ -44,6 +44,27 @@ export function Flashcards({
     dispatch(fetchFlashcards({ deckId }));
   }, [deckId]);
 
+  const handleFlashcardClick = (
+    type: string,
+    flashcard: Flashcard,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    setFlashcard(flashcard);
+
+    switch (type) {
+      case "edit":
+        setFlashcardMode("edit");
+        toggleFlashcardModal();
+        break;
+      case "delete":
+        setFlashcardMode("delete");
+        toggleFlashcardModal();
+        break;
+      case "favorite":
+    }
+  };
+
   if (loading) {
     return <Loader mx="auto" color="blue" />;
   }
@@ -82,6 +103,7 @@ export function Flashcards({
         <Flex direction="column" gap="md" m={5}>
           {flashcards.map((flashcard) => (
             <motion.div
+              onClick={(e) => handleFlashcardClick("edit", flashcard, e)}
               key={flashcard._id}
               whileHover={{
                 scale: 1.03,
@@ -130,7 +152,14 @@ export function Flashcards({
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <ActionIcon color="red" size="sm" variant="light">
+                      <ActionIcon
+                        onClick={(e) =>
+                          handleFlashcardClick("delete", flashcard, e)
+                        }
+                        color="red"
+                        size="sm"
+                        variant="light"
+                      >
                         <i
                           className="fa fa-trash-o"
                           style={{ fontSize: "12px" }}

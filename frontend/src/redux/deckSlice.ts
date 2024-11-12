@@ -170,4 +170,5 @@ const deckSlice = createSlice({
   },
 });
 
+export const { updateFlashcardCount } = deckSlice.actions;
 export default deckSlice.reducer;

@@ -1,7 +1,15 @@
-import { createFlashcard } from "@/redux/flashcardSlice";
+import { updateFlashcardCount } from "@/redux/deckSlice";
+import { createFlashcard, deleteFlashcard } from "@/redux/flashcardSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
-import { Button, Flex, Modal, Text, Textarea } from "@mantine/core";
+import {
+  Button,
+  Flex,
+  Modal,
+  Notification,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 
 interface FlashcardModalProps {
@@ -36,12 +44,11 @@ export function FlashcardModal({
 
   const showErrorMsg = (message: string) => {
     setErrorMsg(message);
-    setTimeout(() => setErrorMsg(null), 3000);
   };
 
   const handleSubmit = (isCreatingAnother = false) => {
-    if (mode === "create" || mode === "delete") {
-      if (!frontText || !backText) {
+    if (mode === "create" || mode === "edit") {
+      if (!frontText.trim() || !backText.trim()) {
         showErrorMsg("You must have content for both front and back text");
         return;
       }
@@ -49,10 +56,18 @@ export function FlashcardModal({
     if (deckId) {
       if (mode === "create") {
         dispatch(createFlashcard({ deckId, frontText, backText }));
+        dispatch(updateFlashcardCount({ deckId, incrementBy: 1 }));
         if (isCreatingAnother) {
           setFrontText("");
           setBackText("");
           return;
+        }
+      }
+      if (flashcard) {
+        if (mode === "edit") {
+        } else if (mode === "delete") {
+          dispatch(deleteFlashcard({ _id: flashcard._id }));
+          dispatch(updateFlashcardCount({ deckId, incrementBy: -1 }));
         }
       }
     }
@@ -106,38 +121,67 @@ export function FlashcardModal({
   };
 
   return (
-    <Modal
-      opened={flashcardOpened}
-      onClose={toggleFlashcardModal}
-      title={getTitle()}
-    >
-      <Flex direction="column" gap="md" pb={20}>
-        {getModalBody()}
-      </Flex>
-      <Flex justify="flex-end" gap="xs">
-        {mode === "delete" ? (
-          <>
-            <Button onClick={toggleFlashcardModal}>Cancel</Button>
-            <Button onClick={() => handleSubmit()}>Delete</Button>
-          </>
-        ) : (
-          <>
-            <Button onClick={() => handleSubmit()} size="xs" radius="xl">
-              Save and close
-            </Button>
-            {mode == "create" && (
-              <Button
-                onClick={() => handleSubmit(true)}
-                size="xs"
-                radius="xl"
-                color="cyan"
-              >
-                Add another
-              </Button>
-            )}
-          </>
+    <>
+      <Modal
+        opened={flashcardOpened}
+        onClose={toggleFlashcardModal}
+        title={getTitle()}
+      >
+        {errorMsg && (
+          <Notification
+            my={5}
+            withBorder
+            color="red"
+            title="Oops!"
+            onClose={() => setErrorMsg(null)}
+          >
+            {errorMsg}
+          </Notification>
         )}
-      </Flex>
-    </Modal>
+        <Flex direction="column" gap="md" pb={20}>
+          {getModalBody()}
+        </Flex>
+        <Flex justify="flex-end" gap="xs">
+          {mode === "delete" ? (
+            <>
+              <Button
+                variant="filled"
+                radius="xl"
+                size="xs"
+                color="gray"
+                onClick={toggleFlashcardModal}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="filled"
+                radius="xl"
+                size="xs"
+                color="red"
+                onClick={() => handleSubmit()}
+              >
+                Delete
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={() => handleSubmit()} size="xs" radius="xl">
+                Save and close
+              </Button>
+              {mode == "create" && (
+                <Button
+                  onClick={() => handleSubmit(true)}
+                  size="xs"
+                  radius="xl"
+                  color="cyan"
+                >
+                  Add another
+                </Button>
+              )}
+            </>
+          )}
+        </Flex>
+      </Modal>
+    </>
   );
 }

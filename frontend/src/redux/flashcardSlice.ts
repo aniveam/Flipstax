@@ -40,6 +40,16 @@ export const createFlashcard = createAsyncThunk<
   return response.data;
 });
 
+export const deleteFlashcard = createAsyncThunk<Flashcard, { _id: string }>(
+  "flashcards/deleteFlashcard",
+  async ({ _id }) => {
+    const response = await api.delete("/flashcards", {
+      data: { flashcardId: _id },
+    });
+    return response.data;
+  }
+);
+
 const flashcardSlice = createSlice({
   name: "flashcards",
   initialState,
@@ -95,7 +105,20 @@ const flashcardSlice = createSlice({
       .addCase(createFlashcard.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to create flashcard";
-      });
+      })
+      .addCase(deleteFlashcard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        deleteFlashcard.fulfilled,
+        (state, action: PayloadAction<Flashcard>) => {
+          state.loading = false;
+          state.flashcards = state.flashcards.filter(
+            (flashcard) => flashcard._id !== action.payload._id
+          );
+        }
+      );
   },
 });
 

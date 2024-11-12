@@ -44,4 +44,19 @@ const createFlashcard = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export { createFlashcard, fetchFlashcards };
+const deleteFlashcard = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (userId) {
+      const { flashcardId } = req.body;
+      const flashcard = await Flashcard.findByIdAndDelete({ _id: flashcardId });
+      res.status(200).json(flashcard);
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error: deleteFlashcard" });
+  }
+};
+
+export { createFlashcard, deleteFlashcard, fetchFlashcards };
