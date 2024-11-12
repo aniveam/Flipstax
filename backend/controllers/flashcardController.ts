@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
+import Deck from "../models/Deck";
 import Flashcard from "../models/Flashcard";
 
 const fetchFlashcards = async (req: AuthenticatedRequest, res: Response) => {
@@ -7,8 +8,13 @@ const fetchFlashcards = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     const deckId = req.query.deckId as string;
     if (userId) {
+      const deck = await Deck.findById(deckId);
+      if (!deck) {
+        res.status(404).json({ error: "Deck not found" });
+        return;
+      }
       const flashcards = await Flashcard.find({ deckId });
-      res.status(200).json(flashcards);
+      res.status(200).json({ flashcards, deckName: deck.name });
     } else {
       res.status(400).json({ error: "User not authenticated" });
     }

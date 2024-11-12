@@ -9,26 +9,26 @@ import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import Flashcard from "@/types/Flashcard";
 import {
-  ActionIcon,
   AppShell,
   Burger,
-  Button,
   Flex,
   Group,
   Image,
-  ScrollArea,
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export function Home() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const { toggleColorScheme } = useMantineColorScheme({
+    keepTransitions: true,
+  });
+  const { signOut } = useAuth();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { deckId } = useParams();
 
   // Decks
@@ -47,11 +47,6 @@ export function Home() {
     "create" | "edit" | "delete" | ""
   >("");
   const [flashcard, setFlashcard] = useState<Flashcard | null>(null);
-
-  const { signOut } = useAuth();
-  const { toggleColorScheme } = useMantineColorScheme({
-    keepTransitions: true,
-  });
 
   useEffect(() => {
     const fetchUserDecks = () => {
@@ -119,71 +114,20 @@ export function Home() {
       </AppShell.Header>
       <AppShell.Navbar p="md">
         {deckId ? (
-          <>
-            <AppShell.Section>
-              <Flex justify="space-between" align="center">
-                <Flex
-                  onClick={() => navigate("/dashboard")}
-                  direction="row"
-                  align="center"
-                  gap="xs"
-                  style={{ cursor: "pointer" }}
-                  maw="60%"
-                >
-                  <ActionIcon variant="subtle">
-                    <i className="fa-solid fa-arrow-left"></i>
-                  </ActionIcon>
-                  <Title size="md">{deck?.name}</Title>
-                </Flex>
-                <Button
-                  onClick={() => {
-                    setFlashcardOpened(true);
-                    setFlashcardMode("create");
-                  }}
-                  size="xs"
-                  radius="xl"
-                  color="cyan"
-                >
-                  Create flashcard
-                </Button>
-              </Flex>
-            </AppShell.Section>
-            <AppShell.Section grow my="md" component={ScrollArea}>
-              <Flashcards
-                deckId={deckId}
-                deck={deck}
-                setFlashcard={setFlashcard}
-                setFlashcardMode={setFlashcardMode}
-                toggleFlashcardModal={toggleFlashcardModal}
-              />
-            </AppShell.Section>
-          </>
+          <Flashcards
+            deckId={deckId}
+            setFlashcard={setFlashcard}
+            setFlashcardMode={setFlashcardMode}
+            setFlashcardOpened={setFlashcardOpened}
+            toggleFlashcardModal={toggleFlashcardModal}
+          />
         ) : (
-          <>
-            <AppShell.Section>
-              <Flex justify="space-between" align="center">
-                <Title size="md">Your decks</Title>
-                <Button
-                  onClick={() => {
-                    setDeckOpened(true);
-                    setDeckMode("create");
-                  }}
-                  size="xs"
-                  radius="xl"
-                  color="cyan"
-                >
-                  Create deck
-                </Button>
-              </Flex>
-            </AppShell.Section>
-            <AppShell.Section grow my="md" component={ScrollArea}>
-              <Decks
-                setDeck={setDeck}
-                setDeckMode={setDeckMode}
-                toggleDeckModal={toggleDeckModal}
-              />
-            </AppShell.Section>
-          </>
+          <Decks
+            setDeck={setDeck}
+            setDeckMode={setDeckMode}
+            setDeckOpened={setDeckOpened}
+            toggleDeckModal={toggleDeckModal}
+          />
         )}
       </AppShell.Navbar>
       <AppShell.Main>Main</AppShell.Main>

@@ -4,18 +4,20 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface FlashcardState {
   flashcards: Flashcard[];
+  deckName: string;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: FlashcardState = {
   flashcards: [],
+  deckName: "",
   loading: false,
   error: null,
 };
 
 export const fetchFlashcards = createAsyncThunk<
-  Flashcard[],
+  { flashcards: Flashcard[]; deckName: string },
   { deckId: string }
 >("flashcards/fetchFlashcards", async ({ deckId }) => {
   const response = await api.get("/flashcards", {
@@ -51,11 +53,12 @@ const flashcardSlice = createSlice({
       })
       .addCase(
         fetchFlashcards.fulfilled,
-        (state, action: PayloadAction<Flashcard[]>) => {
+        (
+          state,
+          action: PayloadAction<{ flashcards: Flashcard[]; deckName: string }>
+        ) => {
           state.loading = false;
-          // Sort the flashcards based off favorited, if both favorited sort by updated at (desc),
-          // else sort by created at (desc)
-          state.flashcards = action.payload.sort((a, b) => {
+          state.flashcards = action.payload.flashcards.sort((a, b) => {
             if (b.favorited !== a.favorited) {
               return b.favorited ? 1 : -1;
             }
@@ -69,6 +72,7 @@ const flashcardSlice = createSlice({
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
           });
+          state.deckName = action.payload.deckName;
         }
       )
       .addCase(fetchFlashcards.rejected, (state, action) => {
