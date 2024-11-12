@@ -75,9 +75,17 @@ const deckSlice = createSlice({
       .addCase(fetchDecks.fulfilled, (state, action: PayloadAction<Deck[]>) => {
         state.loading = false;
         state.decks = action.payload.sort((a, b) => {
+          // Sort by pinned status first
           if (b.pinned !== a.pinned) {
             return b.pinned ? 1 : -1;
           }
+          // If both are pinned, sort by updatedAt (descending)
+          if (a.pinned && b.pinned) {
+            return (
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          }
+          // If neither are pinned, sort by createdAt (descending)
           return (
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
@@ -119,16 +127,21 @@ const deckSlice = createSlice({
           if (index !== -1) {
             state.decks[index] = {
               ...action.payload.deck,
-              flashcardCount: action.payload.flashcardCount
+              flashcardCount: action.payload.flashcardCount,
             };
           }
           state.decks.sort((a, b) => {
             if (b.pinned !== a.pinned) {
               return b.pinned ? 1 : -1;
             }
-            if (b.pinned !== a.pinned) {
-              return b.pinned ? 1 : -1;
+
+            if (a.pinned && b.pinned) {
+              return (
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
+              );
             }
+
             return (
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );

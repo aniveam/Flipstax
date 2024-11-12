@@ -5,6 +5,7 @@ import { Decks } from "@/Pages/Dashboard/Decks";
 import { useAppDispatch } from "@/redux/hooks";
 import Deck from "@/types/Deck";
 import {
+  ActionIcon,
   AppShell,
   Burger,
   Button,
@@ -17,12 +18,16 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchDecks } from "../../redux/deckSlice";
 
 export function Home() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { deckId } = useParams();
+
   // Decks
   const [deckOpened, setDeckOpened] = useState<boolean>(false);
   const [deckMode, setDeckMode] = useState<"create" | "edit" | "delete" | "">(
@@ -102,25 +107,54 @@ export function Home() {
         </Flex>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <AppShell.Section>
-          <Flex justify="space-between" align="center">
-            <Title size="md">Your decks</Title>
-            <Button
-              onClick={() => {
-                setDeckOpened(true);
-                setDeckMode("create");
-              }}
-              size="xs"
-              radius="xl"
-              color="cyan"
-            >
-              Create deck
-            </Button>
-          </Flex>
-        </AppShell.Section>
-        <AppShell.Section grow my="md" component={ScrollArea}>
-          <Decks setDeck={setDeck} setDeckMode={setDeckMode} toggleDeckModal={toggleDeckModal} />
-        </AppShell.Section>
+        {deckId && deck ? (
+          <AppShell.Section>
+            <Flex justify="space-between" align="center">
+              <Flex
+                onClick={() => navigate("/dashboard")}
+                direction="row"
+                align="center"
+                gap="xs"
+                style={{ cursor: "pointer" }}
+                maw="60%"
+              >
+                <ActionIcon variant="subtle">
+                  <i className="fa-solid fa-arrow-left"></i>
+                </ActionIcon>
+                <Title size="md">{deck.name}</Title>
+              </Flex>
+              <Button size="xs" radius="xl" color="cyan">
+                Create flashcard
+              </Button>
+            </Flex>
+          </AppShell.Section>
+        ) : (
+          <>
+            <AppShell.Section>
+              <Flex justify="space-between" align="center">
+                <Title size="md">Your decks</Title>
+                <Button
+                  onClick={() => {
+                    setDeckOpened(true);
+                    setDeckMode("create");
+                  }}
+                  size="xs"
+                  radius="xl"
+                  color="cyan"
+                >
+                  Create deck
+                </Button>
+              </Flex>
+            </AppShell.Section>
+            <AppShell.Section grow my="md" component={ScrollArea}>
+              <Decks
+                setDeck={setDeck}
+                setDeckMode={setDeckMode}
+                toggleDeckModal={toggleDeckModal}
+              />
+            </AppShell.Section>
+          </>
+        )}
       </AppShell.Navbar>
       <AppShell.Main>Main</AppShell.Main>
 
