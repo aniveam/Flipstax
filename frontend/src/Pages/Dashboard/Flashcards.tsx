@@ -1,4 +1,4 @@
-import { fetchFlashcards } from "@/redux/flashcardSlice";
+import { editFlashcard, fetchFlashcards } from "@/redux/flashcardSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
 import {
@@ -8,7 +8,6 @@ import {
   Card,
   Flex,
   Group,
-  Loader,
   ScrollArea,
   Text,
   Title,
@@ -38,7 +37,7 @@ export function Flashcards({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { deckName } = useAppSelector((state) => state.flashcards);
-  const { flashcards, loading } = useAppSelector((state) => state.flashcards);
+  const { flashcards } = useAppSelector((state) => state.flashcards);
 
   useEffect(() => {
     dispatch(fetchFlashcards({ deckId }));
@@ -62,12 +61,17 @@ export function Flashcards({
         toggleFlashcardModal();
         break;
       case "favorite":
+        dispatch(
+          editFlashcard({
+            _id: flashcard._id,
+            favoriteStatus: !flashcard.favorited,
+            frontText: flashcard.frontText,
+            backText: flashcard.backText,
+          })
+        );
+        break;
     }
   };
-
-  if (loading) {
-    return <Loader mx="auto" color="blue" />;
-  }
 
   return (
     <>
@@ -134,7 +138,14 @@ export function Flashcards({
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <ActionIcon color="yellow" size="sm" variant="light">
+                      <ActionIcon
+                        onClick={(e) =>
+                          handleFlashcardClick("favorite", flashcard, e)
+                        }
+                        color="yellow"
+                        size="sm"
+                        variant="light"
+                      >
                         {flashcard.favorited ? (
                           <i
                             className="fa-solid fa-star"

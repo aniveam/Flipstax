@@ -31,7 +31,7 @@ export const fetchFlashcards = createAsyncThunk<
 export const createFlashcard = createAsyncThunk<
   Flashcard,
   { deckId: string; frontText: string; backText: string }
->("flashcards/create", async ({ deckId, frontText, backText }) => {
+>("flashcards/createFlashcard", async ({ deckId, frontText, backText }) => {
   const response = await api.post("/flashcards", {
     deckId,
     frontText,
@@ -39,6 +39,22 @@ export const createFlashcard = createAsyncThunk<
   });
   return response.data;
 });
+
+export const editFlashcard = createAsyncThunk<
+  Flashcard,
+  { _id: string; favoriteStatus: boolean; frontText: string; backText: string }
+>(
+  "flashcards/editFlashcard",
+  async ({ _id, favoriteStatus, frontText, backText }) => {
+    const response = await api.put("/flashcards", {
+      flashcardId: _id,
+      favorited: favoriteStatus,
+      frontText,
+      backText,
+    });
+    return response.data;
+  }
+);
 
 export const deleteFlashcard = createAsyncThunk<Flashcard, { _id: string }>(
   "flashcards/deleteFlashcard",
@@ -106,6 +122,42 @@ const flashcardSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to create flashcard";
       })
+      // Handle editFlashcard action
+      .addCase(editFlashcard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        editFlashcard.fulfilled,
+        (state, action: PayloadAction<Flashcard>) => {
+          state.loading = false;
+          const index = state.flashcards.findIndex(
+            (flashcard) => flashcard._id == action.payload._id
+          );
+          if (index !== -1) {
+            state.flashcards[index] = action.payload;
+          }
+          state.flashcards.sort((a, b) => {
+            if (b.favorited !== a.favorited) {
+              return b.favorited ? 1 : -1;
+            }
+            if (b.favorited && a.favorited) {
+              return (
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
+              );
+            }
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        }
+      )
+      .addCase(editFlashcard.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to edit flashcard";
+      })
+      // Handle deleteFlashcard action
       .addCase(deleteFlashcard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,7 +170,11 @@ const flashcardSlice = createSlice({
             (flashcard) => flashcard._id !== action.payload._id
           );
         }
-      );
+      )
+      .addCase(deleteFlashcard.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete flashcard";
+      });
   },
 });
 

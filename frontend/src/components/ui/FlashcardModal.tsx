@@ -1,5 +1,9 @@
 import { updateFlashcardCount } from "@/redux/deckSlice";
-import { createFlashcard, deleteFlashcard } from "@/redux/flashcardSlice";
+import {
+  createFlashcard,
+  deleteFlashcard,
+  editFlashcard,
+} from "@/redux/flashcardSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
 import {
@@ -65,6 +69,14 @@ export function FlashcardModal({
       }
       if (flashcard) {
         if (mode === "edit") {
+          dispatch(
+            editFlashcard({
+              _id: flashcard._id,
+              favoriteStatus: flashcard.favorited,
+              frontText,
+              backText,
+            })
+          );
         } else if (mode === "delete") {
           dispatch(deleteFlashcard({ _id: flashcard._id }));
           dispatch(updateFlashcardCount({ deckId, incrementBy: -1 }));
