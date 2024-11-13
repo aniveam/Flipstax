@@ -3,6 +3,7 @@ import flashcardSlice from "@/redux/flashcardSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import practiceSlice from "./practiceSlice";
 
 const deckPersistConfig = {
   key: "decks",
@@ -13,6 +14,7 @@ const deckPersistConfig = {
 const rootReducer = combineReducers({
   decks: persistReducer(deckPersistConfig, deckSlice),
   flashcards: flashcardSlice,
+  practice: practiceSlice,
 });
 
 export const store = configureStore({

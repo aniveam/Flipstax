@@ -25,6 +25,7 @@ interface FlashcardProps {
     React.SetStateAction<"create" | "edit" | "delete" | "">
   >;
   toggleFlashcardModal: () => void;
+  togglePracticeModal: () => void;
 }
 
 export function Flashcards({
@@ -32,6 +33,7 @@ export function Flashcards({
   setFlashcard,
   setFlashcardMode,
   toggleFlashcardModal,
+  togglePracticeModal,
   setFlashcardOpened,
 }: FlashcardProps) {
   const dispatch = useAppDispatch();
@@ -102,6 +104,19 @@ export function Flashcards({
             Create flashcard
           </Button>
         </Flex>
+      </AppShell.Section>
+      <AppShell.Section
+        mt={16}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        <Button
+          onClick={togglePracticeModal}
+          variant="filled"
+          color="gray"
+          radius="xl"
+        >
+          Practice
+        </Button>
       </AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         <Flex direction="column" gap="md" m={5}>

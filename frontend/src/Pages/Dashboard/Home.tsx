@@ -1,11 +1,13 @@
 import { DeckModal } from "@/components/ui/DeckModal";
 import { FlashcardModal } from "@/components/ui/FlashcardModal";
 import { MotionButton } from "@/components/ui/MotionButton";
+import { PracticeModal } from "@/components/ui/PracticeModal";
 import { useAuth } from "@/context/AuthContext";
 import { Decks } from "@/Pages/Dashboard/Decks";
 import { Flashcards } from "@/Pages/Dashboard/Flashcards";
+import { Practice } from "@/Pages/Dashboard/Practice";
 import { fetchDecks } from "@/redux/deckSlice";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
 import {
   AppShell,
@@ -17,7 +19,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export function Home() {
@@ -38,7 +40,6 @@ export function Home() {
   );
 
   //Flashcards
-  const flashcards = useAppDispatch();
   const [flashcardOpened, setFlashcardOpened] = useState<boolean>(false);
   const toggleFlashcardModal = () => setFlashcardOpened(!flashcardOpened);
   const [flashcardMode, setFlashcardMode] = useState<
@@ -46,13 +47,21 @@ export function Home() {
   >("");
   const [flashcard, setFlashcard] = useState<Flashcard | null>(null);
 
+  //Practice
+  const [practiceOpened, setPracticeOpened] = useState<boolean>(false);
+  const togglePracticeModal = () => setPracticeOpened(!practiceOpened);
+  const { mode } = useAppSelector((state) => state.practice);
+  const practiceContent = useMemo(() => {
+    return mode ? <Practice /> : <p>No Flashcards selected to Practice</p>;
+  }, [mode]);
+
   useEffect(() => {
     const fetchUserDecks = () => {
       dispatch(fetchDecks());
     };
     document.title = "Dashboard" + " • Flipstax";
     fetchUserDecks();
-  }, [flashcards.length]);
+  }, []);
 
   return (
     <AppShell
@@ -118,6 +127,7 @@ export function Home() {
             setFlashcardMode={setFlashcardMode}
             setFlashcardOpened={setFlashcardOpened}
             toggleFlashcardModal={toggleFlashcardModal}
+            togglePracticeModal={togglePracticeModal}
           />
         ) : (
           <Decks
@@ -127,7 +137,7 @@ export function Home() {
           />
         )}
       </AppShell.Navbar>
-      <AppShell.Main>Main</AppShell.Main>
+      <AppShell.Main>{practiceContent}</AppShell.Main>
 
       {/* Modals */}
       <DeckModal
@@ -141,6 +151,10 @@ export function Home() {
         mode={flashcardMode}
         toggleFlashcardModal={toggleFlashcardModal}
         flashcardOpened={flashcardOpened}
+      />
+      <PracticeModal
+        togglePracticeModal={togglePracticeModal}
+        practiceOpened={practiceOpened}
       />
     </AppShell>
   );
