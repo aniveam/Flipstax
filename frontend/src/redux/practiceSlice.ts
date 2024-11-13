@@ -22,21 +22,8 @@ const practiceSlice = createSlice({
       const { mode } = action.payload;
       state.mode = mode;
     },
-    setPracticeFlashcards: (state, action: PayloadAction<Flashcard[]>) => {
-      const mode = state.mode;
-      switch (mode) {
-        case "all":
-          state.flashcards = action.payload;
-          break;
-        case "favorites":
-          state.flashcards = action.payload.filter(
-            (flashcard) => flashcard.favorited
-          );
-      }
-    },
   },
 });
 
-export const { updatePracticeMode, setPracticeFlashcards } =
-  practiceSlice.actions;
+export const { updatePracticeMode } = practiceSlice.actions;
 export default practiceSlice.reducer;

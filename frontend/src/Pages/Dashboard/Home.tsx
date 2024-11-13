@@ -155,6 +155,8 @@ export function Home() {
       <PracticeModal
         togglePracticeModal={togglePracticeModal}
         practiceOpened={practiceOpened}
+        toggleMobile={toggleMobile}
+        toggleDesktop={toggleDesktop}
       />
     </AppShell>
   );
