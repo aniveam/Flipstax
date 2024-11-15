@@ -1,15 +1,8 @@
+import { MotionButton } from "@/components/ui/MotionButton";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import Flashcard from "@/types/Flashcard";
-import {
-  ActionIcon,
-  Button,
-  Card,
-  Flex,
-  Group,
-  Text,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Card, Flex, Group, Text, Title } from "@mantine/core";
 import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 
@@ -37,11 +30,24 @@ export function Practice() {
   useEffect(() => {
     const filtered =
       mode === "favorites"
-        ? flashcards.filter((flashcard) => flashcard.favorited)
+        ? [...flashcards].filter((flashcard) => flashcard.favorited)
         : flashcards;
     setPracticeFlashcards(filtered);
     setCurIdx(0);
   }, [mode, flashcards]);
+
+  //Fisher-Yates shuffle algorithm
+  const shuffleFC = (): void => {
+    // Create a copy of the flashcards array to avoid modifying the original array directly
+    const shuffled = [...flashcards];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setPracticeFlashcards(shuffled);
+    setCurIdx(0);
+  };
 
   const getTitle = (): string => {
     switch (mode) {
@@ -62,6 +68,7 @@ export function Practice() {
         return prevIdx >= practiceFlashcards.length - 1 ? 0 : prevIdx + 1;
       }
     });
+    setFlipped(false);
   };
 
   const handleFlip = () => {
@@ -74,13 +81,27 @@ export function Practice() {
         <Flex direction="column" justify="center" align="center" gap="lg">
           <Flex direction="row" gap="md" align="center" justify="center">
             <Title order={2}>{getTitle()}</Title>
-            <ActionIcon>
+            <ActionIcon onClick={shuffleFC}>
               <i className="fa-solid fa-shuffle"></i>
             </ActionIcon>
           </Flex>
           <Group>
-            <Button onClick={() => handleClick("prev")}>Prev</Button>
-            <Button onClick={() => handleClick("next")}>Next</Button>
+            <MotionButton
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+              color="gray"
+              onClick={() => handleClick("prev")}
+            >
+              Prev
+            </MotionButton>
+            <MotionButton
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+              color="cyan"
+              onClick={() => handleClick("next")}
+            >
+              Next
+            </MotionButton>
           </Group>
           <Text>
             {curIdx + 1} of {practiceFlashcards.length} flashcards
@@ -89,19 +110,21 @@ export function Practice() {
             shadow="sm"
             padding="lg"
             radius="md"
-            w={{ base: "100%", sm: "90%", md: "70%" }}
-            h={450}
+            w={{ base: "100%", md: "80%", lg: "70%", xl: "55%" }}
+            h={{ base: 400, md: 500 }}
             display="flex"
             className={`flashcard ${flipped ? "flipped" : ""}`}
             onClick={handleFlip}
             withBorder
             style={{ cursor: "pointer" }}
           >
-            <Text>
-              {flipped
-                ? practiceFlashcards[curIdx]?.backText
-                : practiceFlashcards[curIdx]?.frontText}
-            </Text>
+            <Flex align="center" justify="center" w="100%" h="80%">
+              <Text size="xl" fw={500} p="lg">
+                {flipped
+                  ? practiceFlashcards[curIdx]?.backText
+                  : practiceFlashcards[curIdx]?.frontText}
+              </Text>
+            </Flex>
           </Card>
         </Flex>
       )}
