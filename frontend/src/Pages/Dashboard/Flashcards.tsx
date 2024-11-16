@@ -141,19 +141,17 @@ export function Flashcards({
                 data-dark-bg="var(--mantine-color-dark-8)"
               >
                 <Group justify="space-between" mb="xs" align="flex-start">
-                  <Box maw="100%">
-                    <Text
-                      fw={600}
-                      size="md"
-                      w="70%"
-                      style={{
-                        wordBreak: "break-word",
-                        whiteSpace: "pre-wrap",
-                      }}
-                    >
-                      {parse(flashcard.frontText.replace(/\n/g, "<br />"))}
-                    </Text>
-                  </Box>
+                  <Text
+                    fw={600}
+                    size="md"
+                    w="70%"
+                    style={{
+                      wordBreak: "break-word",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {parse(flashcard.frontText.replace(/\n/g, "<br />"))}
+                  </Text>
                   <Group gap={5} ml="auto" w="auto">
                     <motion.div
                       whileHover={{ scale: 1.1 }}

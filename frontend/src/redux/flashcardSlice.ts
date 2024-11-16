@@ -80,15 +80,6 @@ const flashcardSlice = createSlice({
         (state, action: PayloadAction<Flashcard[]>) => {
           state.loading = false;
           state.flashcards = action.payload.sort((a, b) => {
-            if (b.favorited !== a.favorited) {
-              return b.favorited ? 1 : -1;
-            }
-            if (b.favorited && a.favorited) {
-              return (
-                new Date(b.updatedAt).getTime() -
-                new Date(a.updatedAt).getTime()
-              );
-            }
             return (
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
@@ -132,15 +123,6 @@ const flashcardSlice = createSlice({
             state.flashcards[index] = action.payload;
           }
           state.flashcards.sort((a, b) => {
-            if (b.favorited !== a.favorited) {
-              return b.favorited ? 1 : -1;
-            }
-            if (b.favorited && a.favorited) {
-              return (
-                new Date(b.updatedAt).getTime() -
-                new Date(a.updatedAt).getTime()
-              );
-            }
             return (
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
