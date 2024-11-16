@@ -47,6 +47,7 @@ export function Practice() {
     filteredFlashcards.forEach((flashcard) => list.insert(flashcard));
     setPracticeList(list);
     setCurrentNode(list.getFront());
+    setCurIdx(1);
   };
 
   const getTitle = (): string => {
@@ -149,6 +150,8 @@ export function Practice() {
               radius="md"
               w={{ base: 350, md: 600, lg: 700 }}
               h={{ base: 400, md: 500 }}
+              bg="var(--mantine-color-blue-light)"
+              data-dark-bg="var(--mantine-color-dark-8)"
               withBorder
               style={{
                 cursor: "pointer",
@@ -156,7 +159,58 @@ export function Practice() {
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
                 transition: "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)",
               }}
+              pos="relative"
             >
+              {!flipped && (
+                <Group
+                  pos="absolute"
+                  top="5%"
+                  right="3%"
+                  style={{ zIndex: 50 }}
+                  gap="xs"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ActionIcon color="yellow" size="sm" variant="light">
+                      {currentNode?.flashcard?.favorited ? (
+                        <i
+                          style={{ fontSize: "12px" }}
+                          className="fa-solid fa-star"
+                        ></i>
+                      ) : (
+                        <i
+                          style={{ fontSize: "12px" }}
+                          className="fa-regular fa-star"
+                        ></i>
+                      )}
+                    </ActionIcon>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ActionIcon color="green" size="sm" variant="light">
+                      <i
+                        className="fa fa-pencil-square-o"
+                        style={{ fontSize: "12px" }}
+                      ></i>
+                    </ActionIcon>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ActionIcon color="red" size="sm" variant="light">
+                      <i
+                        className="fa fa-trash-o"
+                        style={{ fontSize: "12px" }}
+                      ></i>
+                    </ActionIcon>
+                  </motion.div>
+                </Group>
+              )}
               <Flex
                 align="center"
                 justify="center"

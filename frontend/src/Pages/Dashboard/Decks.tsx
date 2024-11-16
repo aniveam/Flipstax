@@ -111,7 +111,7 @@ export function Decks({
                   mb="xs"
                   align="flex-start"
                 >
-                  <Text fw={600} size="md" w="70%">
+                  <Text fw={600} size="md" w="60%">
                     {deck.name}
                   </Text>
                   <Group gap={5} ml="auto" w="auto">

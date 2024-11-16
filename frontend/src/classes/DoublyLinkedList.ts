@@ -14,6 +14,7 @@ class DoublyLinkedList {
   head: Node;
   tail: Node;
   size: number = 0;
+  nodeMap: Map<string, Node> = new Map();
 
   constructor() {
     this.head = new Node();
@@ -29,6 +30,7 @@ class DoublyLinkedList {
     this.tail.prev!.next = newNode;
     this.tail.prev = newNode;
 
+    this.nodeMap.set(flashcard._id, newNode);
     this.size += 1;
   }
   // Remove from front of list
@@ -85,7 +87,7 @@ class DoublyLinkedList {
   }
   // Get the first flashcard in the list
   getFront(): Node | null {
-    return this.size > 0 ? this.head.next: null;
+    return this.size > 0 ? this.head.next : null;
   }
   // Get the next flashcard in the list
   getNext(): Node | null {
