@@ -3,10 +3,11 @@ import { MotionButton } from "@/components/ui/MotionButton";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Node } from "@/types/Node";
-import { ActionIcon, Card, Flex, Group, Text, Title } from "@mantine/core";
+import { ActionIcon, Box, Card, Flex, Group, Text, Title } from "@mantine/core";
 import { createSelector } from "@reduxjs/toolkit";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import parse from "html-react-parser";
+import { useEffect, useState } from "react";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
@@ -109,6 +110,7 @@ export function Practice() {
               <i className="fa fa-refresh" aria-hidden="true"></i>
             </ActionIcon>
           </Flex>
+
           <Group>
             <MotionButton
               whileHover={{ scale: 1.05 }}
@@ -127,9 +129,11 @@ export function Practice() {
               Next
             </MotionButton>
           </Group>
+
           <Text>
             {curIdx} of {practiceList.size} flashcards
           </Text>
+
           <motion.div
             key={currentNode?.flashcard?._id}
             initial={{ x: direction === "left" ? 150 : -150, opacity: 0 }}
@@ -139,29 +143,58 @@ export function Practice() {
             onAnimationComplete={() => setDirection(null)}
           >
             <Card
+              onClick={handleFlip}
               shadow="sm"
               padding="lg"
               radius="md"
               w={{ base: 350, md: 600, lg: 700 }}
               h={{ base: 400, md: 500 }}
-              display="flex"
-              className={`flashcard ${flipped ? "flipped" : ""}`}
-              onClick={handleFlip}
               withBorder
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                transformStyle: "preserve-3d",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                transition: "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)",
+              }}
             >
-              <Flex align="center" justify="center" w="100%" h="80%">
-                <Text size="xl" fw={500} p="lg">
-                  {flipped
-                    ? currentNode?.flashcard?.backText
-                    : currentNode?.flashcard?.frontText}
-                </Text>
+              <Flex
+                align="center"
+                justify="center"
+                style={{
+                  transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                  transition: "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  overflowY: "auto",
+                  height: "100%",
+                }}
+              >
+                <Box mah="100%">
+                  <Text
+                    ta="center"
+                    size="xl"
+                    fw={500}
+                    style={{ wordBreak: "break-word" }}
+                  >
+                    {flipped
+                      ? parse(
+                          currentNode?.flashcard?.backText.replace(
+                            /\n/g,
+                            "<br />"
+                          ) || ""
+                        )
+                      : parse(
+                          currentNode?.flashcard?.frontText.replace(
+                            /\n/g,
+                            "<br />"
+                          ) || ""
+                        )}
+                  </Text>
+                </Box>
               </Flex>
             </Card>
           </motion.div>
         </Flex>
       ) : (
-        <Title size="h3" style={{ textAlign: "center" }}>
+        <Title order={3} ta="center">
           No flashcards to display
         </Title>
       )}

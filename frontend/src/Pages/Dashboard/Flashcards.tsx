@@ -4,6 +4,7 @@ import Flashcard from "@/types/Flashcard";
 import {
   ActionIcon,
   AppShell,
+  Box,
   Button,
   Card,
   Flex,
@@ -139,15 +140,20 @@ export function Flashcards({
                 bg="var(--mantine-color-blue-light)"
                 data-dark-bg="var(--mantine-color-dark-8)"
               >
-                <Group
-                  justify="space-between"
-                  wrap="nowrap"
-                  mb="xs"
-                  align="flex-start"
-                >
-                  <Text fw={600} size="md" w="70%">
-                    {parse(flashcard.frontText.replace(/\n/g, "<br />"))}
-                  </Text>
+                <Group justify="space-between" mb="xs" align="flex-start">
+                  <Box maw="100%">
+                    <Text
+                      fw={600}
+                      size="md"
+                      w="70%"
+                      style={{
+                        wordBreak: "break-word",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {parse(flashcard.frontText.replace(/\n/g, "<br />"))}
+                    </Text>
+                  </Box>
                   <Group gap={5} ml="auto" w="auto">
                     <motion.div
                       whileHover={{ scale: 1.1 }}
@@ -194,9 +200,15 @@ export function Flashcards({
                     </motion.div>
                   </Group>
                 </Group>
-                <Text size="sm" c="dimmed">
-                  {parse(flashcard.backText.replace(/\n/g, "<br />"))}
-                </Text>
+                <Box maw="100%">
+                  <Text
+                    size="sm"
+                    c="dimmed"
+                    style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
+                  >
+                    {parse(flashcard.backText.replace(/\n/g, "<br />"))}
+                  </Text>
+                </Box>
               </Card>
             </motion.div>
           ))}
