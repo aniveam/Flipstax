@@ -1,10 +1,12 @@
+import DoublyLinkedList from "@/classes/DoublyLinkedList";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
-import Flashcard from "@/types/Flashcard";
+import { Node } from "@/types/Node";
 import { ActionIcon, Card, Flex, Group, Text, Title } from "@mantine/core";
 import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
@@ -23,30 +25,27 @@ const selectPracticeState = createSelector(
 export function Practice() {
   const { mode, flashcards, selectedDeck } =
     useAppSelector(selectPracticeState);
-  const [practiceFlashcards, setPracticeFlashcards] = useState<Flashcard[]>([]);
-  const [curIdx, setCurIdx] = useState<number>(0);
+  const [practiceList, setPracticeList] = useState<DoublyLinkedList>(
+    new DoublyLinkedList()
+  );
+  const [curIdx, setCurIdx] = useState<number>(1);
+  const [currentNode, setCurrentNode] = useState<Node | null>(null);
   const [flipped, setFlipped] = useState<boolean>(false);
+  const [direction, setDirection] = useState<"left" | "right" | null>(null);
 
   useEffect(() => {
-    const filtered =
+    initializeList();
+  }, [mode, flashcards]);
+
+  const initializeList = () => {
+    const list = new DoublyLinkedList();
+    const filteredFlashcards =
       mode === "favorites"
         ? [...flashcards].filter((flashcard) => flashcard.favorited)
         : flashcards;
-    setPracticeFlashcards(filtered);
-    setCurIdx(0);
-  }, [mode, flashcards]);
-
-  //Fisher-Yates shuffle algorithm
-  const shuffleFC = (): void => {
-    // Create a copy of the flashcards array to avoid modifying the original array directly
-    const shuffled = [...flashcards];
-
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    setPracticeFlashcards(shuffled);
-    setCurIdx(0);
+    filteredFlashcards.forEach((flashcard) => list.insert(flashcard));
+    setPracticeList(list);
+    setCurrentNode(list.getFront());
   };
 
   const getTitle = (): string => {
@@ -61,13 +60,16 @@ export function Practice() {
   };
 
   const handleClick = (type: "prev" | "next"): void => {
-    setCurIdx((prevIdx) => {
-      if (type === "prev") {
-        return prevIdx <= 0 ? practiceFlashcards.length - 1 : prevIdx - 1;
-      } else {
-        return prevIdx >= practiceFlashcards.length - 1 ? 0 : prevIdx + 1;
-      }
-    });
+    setDirection(type === "next" ? "left" : "right");
+    if (type === "next") {
+      practiceList.moveFrontToBack();
+      setCurrentNode(practiceList.getFront());
+      setCurIdx((prev) => (prev === practiceList.size ? 1 : prev + 1));
+    } else {
+      practiceList.moveBackToFront();
+      setCurrentNode(practiceList.getFront());
+      setCurIdx((prev) => (prev === 1 ? practiceList.size : prev - 1));
+    }
     setFlipped(false);
   };
 
@@ -75,14 +77,36 @@ export function Practice() {
     setFlipped((prev) => !prev);
   };
 
+  const handleShuffle = () => {
+    practiceList.shuffleFC();
+    setCurrentNode(practiceList.getFront());
+    setCurIdx(1);
+    setFlipped(false);
+  };
+
+  const handleRefresh = () => {
+    initializeList();
+    setCurIdx(1);
+    setFlipped(false);
+  };
+
   return (
     <>
-      {practiceFlashcards.length > 0 && (
-        <Flex direction="column" justify="center" align="center" gap="lg">
-          <Flex direction="row" gap="md" align="center" justify="center">
-            <Title order={2}>{getTitle()}</Title>
-            <ActionIcon onClick={shuffleFC}>
+      {practiceList.size > 0 ? (
+        <Flex
+          style={{ overflow: "hidden" }}
+          direction="column"
+          justify="center"
+          align="center"
+          gap="lg"
+        >
+          <Flex direction="row" gap="sm" align="center" justify="center">
+            <Title size="h2">{getTitle()}</Title>
+            <ActionIcon onClick={handleShuffle}>
               <i className="fa-solid fa-shuffle"></i>
+            </ActionIcon>
+            <ActionIcon onClick={handleRefresh}>
+              <i className="fa fa-refresh" aria-hidden="true"></i>
             </ActionIcon>
           </Flex>
           <Group>
@@ -104,29 +128,42 @@ export function Practice() {
             </MotionButton>
           </Group>
           <Text>
-            {curIdx + 1} of {practiceFlashcards.length} flashcards
+            {curIdx} of {practiceList.size} flashcards
           </Text>
-          <Card
-            shadow="sm"
-            padding="lg"
-            radius="md"
-            w={{ base: "100%", md: "80%", lg: "70%", xl: "55%" }}
-            h={{ base: 400, md: 500 }}
-            display="flex"
-            className={`flashcard ${flipped ? "flipped" : ""}`}
-            onClick={handleFlip}
-            withBorder
-            style={{ cursor: "pointer" }}
+          <motion.div
+            key={currentNode?.flashcard?._id}
+            initial={{ x: direction === "left" ? 150 : -150, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: direction === "left" ? -150 : 150, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            onAnimationComplete={() => setDirection(null)}
           >
-            <Flex align="center" justify="center" w="100%" h="80%">
-              <Text size="xl" fw={500} p="lg">
-                {flipped
-                  ? practiceFlashcards[curIdx]?.backText
-                  : practiceFlashcards[curIdx]?.frontText}
-              </Text>
-            </Flex>
-          </Card>
+            <Card
+              shadow="sm"
+              padding="lg"
+              radius="md"
+              w={{ base: 350, md: 600, lg: 700 }}
+              h={{ base: 400, md: 500 }}
+              display="flex"
+              className={`flashcard ${flipped ? "flipped" : ""}`}
+              onClick={handleFlip}
+              withBorder
+              style={{ cursor: "pointer" }}
+            >
+              <Flex align="center" justify="center" w="100%" h="80%">
+                <Text size="xl" fw={500} p="lg">
+                  {flipped
+                    ? currentNode?.flashcard?.backText
+                    : currentNode?.flashcard?.frontText}
+                </Text>
+              </Flex>
+            </Card>
+          </motion.div>
         </Flex>
+      ) : (
+        <Title size="h3" style={{ textAlign: "center" }}>
+          No flashcards to display
+        </Title>
       )}
     </>
   );

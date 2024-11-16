@@ -85,6 +85,7 @@ export function FlashcardModal({
     }
     setFrontText("");
     setBackText("");
+    setErrorMsg(null);
     toggleFlashcardModal();
   };
 
