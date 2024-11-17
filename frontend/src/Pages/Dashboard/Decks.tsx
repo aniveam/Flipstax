@@ -41,7 +41,7 @@ export function Decks({
   const deckTrie = new TrieDeck();
 
   const icons = {
-    pin: ["fa-solid fa-thumbtack", "blue", "yellow"],
+    pin: ["fa-solid fa-thumbtack", "gray", "yellow"],
     edit: ["fa fa-pencil-square-o", "green"],
     delete: ["fa fa-trash-o", "red"],
   };
