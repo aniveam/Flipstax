@@ -127,21 +127,38 @@ export function Decks({
           />
           <Menu shadow="md" width={200}>
             <Menu.Target>
-              <ActionIcon size="md">
-                <i className="fa-solid fa-filter"></i>
+              <ActionIcon color="cyan" size="md" variant="light">
+                <i
+                  className="fa-solid fa-filter"
+                  style={{ fontSize: "14px" }}
+                ></i>
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>Filter by</Menu.Label>
               <Menu.Item
                 onClick={() => handleFilterBy("all")}
-                leftSection={<i className="fa-solid fa-list"></i>}
+                leftSection={
+                  <ActionIcon size="sm" variant="light">
+                    <i
+                      className="fa-solid fa-list"
+                      style={{ fontSize: "12px" }}
+                    ></i>
+                  </ActionIcon>
+                }
               >
                 All decks
               </Menu.Item>
               <Menu.Item
                 onClick={() => handleFilterBy("pinned")}
-                leftSection={<i className="fa-solid fa-thumbtack"></i>}
+                leftSection={
+                  <ActionIcon color="yellow" size="sm" variant="light">
+                    <i
+                      className="fa-solid fa-thumbtack"
+                      style={{ fontSize: "12px" }}
+                    ></i>
+                  </ActionIcon>
+                }
               >
                 Pinned decks
               </Menu.Item>
