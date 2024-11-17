@@ -46,6 +46,19 @@ class DoublyLinkedList {
     }
     return null;
   }
+  deleteNode(flashcardId: string) {
+    const nodeToDelete = this.nodeMap.get(flashcardId);
+    if (nodeToDelete) {
+      if (nodeToDelete.next && nodeToDelete.prev) {
+        nodeToDelete.next.prev = nodeToDelete.prev;
+        nodeToDelete.prev.next = nodeToDelete.next;
+      }
+      this.nodeMap.delete(flashcardId);
+      this.size -= 1;
+      return nodeToDelete.flashcard;
+    }
+    return null;
+  }
   // Remove from front of list
   removeFront(): Flashcard | null {
     if (this.size === 0) {
@@ -135,6 +148,39 @@ class DoublyLinkedList {
       }
     }
     return;
+  }
+  clone(): DoublyLinkedList {
+    const clonedList = new DoublyLinkedList();
+    let current = this.head.next;
+
+    while (current && current !== this.tail) {
+      const flashcardCopy = { ...current.flashcard } as Flashcard;
+      clonedList.insert(flashcardCopy);
+
+      // Update the nodeMap in the cloned list
+      clonedList.nodeMap.set(flashcardCopy._id, clonedList.tail.prev!);
+      current = current.next;
+    }
+
+    return clonedList;
+  }
+  getCurIdx(node: Node | null): number {
+    if (!node) {
+      return 1; //Reset the index to 1
+    }
+
+    let current = this.head.next;
+    let index = 1;
+
+    while (current && current !== this.tail) {
+      if (current === node) {
+        return index;
+      }
+      current = current.next;
+      index++;
+    }
+
+    return 1;
   }
 }
 

@@ -14,7 +14,7 @@ const fetchFlashcards = async (req: AuthenticatedRequest, res: Response) => {
         return;
       }
       const flashcards = await Flashcard.find({ deckId });
-      res.status(200).json(flashcards);
+      res.status(200).json({ flashcards, deckName: deck.name });
     } else {
       res.status(400).json({ error: "User not authenticated" });
     }

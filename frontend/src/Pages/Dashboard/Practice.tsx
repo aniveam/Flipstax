@@ -13,18 +13,18 @@ import { SetStateAction, useEffect, useState } from "react";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
-const selectSelectedDeck = (state: RootState) => state.decks.selectedDeck;
 const updatedFlashcard = (state: RootState) =>
   state.flashcards.updatedFlashcard;
+const deckName = (state: RootState) => state.flashcards.deckName;
 
 // Create memoized selector
 const selectPracticeState = createSelector(
-  [selectMode, selectFlashcards, selectSelectedDeck, updatedFlashcard],
-  (mode, flashcards, selectedDeck, updatedFlashcard) => ({
+  [selectMode, selectFlashcards, updatedFlashcard, deckName],
+  (mode, flashcards, updatedFlashcard, deckName) => ({
     mode,
     flashcards,
-    selectedDeck,
     updatedFlashcard,
+    deckName,
   })
 );
 
@@ -41,7 +41,7 @@ export function Practice({
   setFlashcardMode,
   toggleFlashcardModal,
 }: PracticeProps) {
-  const { mode, flashcards, selectedDeck, updatedFlashcard } =
+  const { mode, flashcards, updatedFlashcard, deckName } =
     useAppSelector(selectPracticeState);
   const [practiceList, setPracticeList] = useState<DoublyLinkedList>(
     new DoublyLinkedList()
@@ -61,11 +61,42 @@ export function Practice({
       const newFlashcard = practiceList.editNode(updatedFlashcard._id, {
         ...updatedFlashcard,
       });
-      // If we are updating the flashcard we are currently practicing, we need to re-render the currentNode
-      // to reflect the recent changes
+      // If we are updating the flashcard we are currently practicing, we need to re-render the currentNode to reflect the recent changes
       if (currentNode && currentNode.flashcard?._id == newFlashcard?._id) {
-        currentNode.flashcard = newFlashcard;
-        setCurrentNode({ ...currentNode });
+        const updatedNode = { ...currentNode, flashcard: newFlashcard };
+        setCurrentNode(updatedNode);
+      }
+      //Favorites Mode
+      if (mode === "favorites") {
+        const newList = practiceList.clone();
+
+        if (!updatedFlashcard.favorited) {
+          //Flashcard is no longer favorited
+          newList.deleteNode(updatedFlashcard._id);
+          setPracticeList(newList);
+          if (
+            currentNode &&
+            currentNode.flashcard?._id == updatedFlashcard._id
+          ) {
+            setCurrentNode(newList.getFront());
+            if (curIdx === newList.size) {
+              setCurIdx((prev) => prev - 1);
+            }
+          }
+        } else {
+          // If we already have this in our list, just change the flashcard, otherwise we insert it
+          const existingNode = newList.nodeMap.get(updatedFlashcard._id);
+          if (existingNode) {
+            existingNode.flashcard = updatedFlashcard;
+          } else {
+            newList.insert(updatedFlashcard);
+          }
+          setPracticeList(newList);
+          if (!currentNode) {
+            setCurrentNode(newList.getFront());
+          }
+        }
+        setCurIdx(newList.getCurIdx(currentNode));
       }
     }
   }, [updatedFlashcard]);
@@ -85,11 +116,11 @@ export function Practice({
   const getTitle = (): string => {
     switch (mode) {
       case "all":
-        return "All Flashcards: " + selectedDeck?.name;
+        return "All Flashcards: " + deckName;
       case "favorites":
-        return "Favorite Flashcards: " + selectedDeck?.name;
+        return "Favorite Flashcards: " + deckName;
       default:
-        return selectedDeck?.name || "";
+        return deckName || "";
     }
   };
 
@@ -98,7 +129,7 @@ export function Practice({
     if (type === "next") {
       practiceList.moveFrontToBack();
       setCurrentNode(practiceList.getFront());
-      setCurIdx((prev) => (prev === practiceList.size ? 1 : prev + 1));
+      setCurIdx((prev) => (prev >= practiceList.size ? 1 : prev + 1));
     } else {
       practiceList.moveBackToFront();
       setCurrentNode(practiceList.getFront());
@@ -162,46 +193,45 @@ export function Practice({
   };
 
   return (
-    <>
-      {practiceList.size > 0 ? (
-        <Flex
-          style={{ overflow: "hidden" }}
-          direction="column"
-          justify="center"
-          align="center"
-          gap="lg"
+    <Flex
+      style={{ overflow: "hidden" }}
+      direction="column"
+      justify="center"
+      align="center"
+      gap="lg"
+    >
+      <Flex direction="row" gap="sm" align="center" justify="center">
+        <Title size="h2" lts={2} fw={500}>
+          {getTitle()}
+        </Title>
+        <ActionIcon onClick={handleShuffle}>
+          <i className="fa-solid fa-shuffle"></i>
+        </ActionIcon>
+        <ActionIcon onClick={handleRefresh}>
+          <i className="fa fa-refresh" aria-hidden="true"></i>
+        </ActionIcon>
+      </Flex>
+
+      <Group>
+        <MotionButton
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+          color="gray"
+          onClick={() => handleClick("prev")}
         >
-          <Flex direction="row" gap="sm" align="center" justify="center">
-            <Title size="h2" lts={2} fw={500}>
-              {getTitle()}
-            </Title>
-            <ActionIcon onClick={handleShuffle}>
-              <i className="fa-solid fa-shuffle"></i>
-            </ActionIcon>
-            <ActionIcon onClick={handleRefresh}>
-              <i className="fa fa-refresh" aria-hidden="true"></i>
-            </ActionIcon>
-          </Flex>
-
-          <Group>
-            <MotionButton
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-              color="gray"
-              onClick={() => handleClick("prev")}
-            >
-              Prev
-            </MotionButton>
-            <MotionButton
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-              color="cyan"
-              onClick={() => handleClick("next")}
-            >
-              Next
-            </MotionButton>
-          </Group>
-
+          Prev
+        </MotionButton>
+        <MotionButton
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+          color="cyan"
+          onClick={() => handleClick("next")}
+        >
+          Next
+        </MotionButton>
+      </Group>
+      {practiceList.size > 0 ? (
+        <>
           <motion.div
             key={currentNode?.flashcard?._id}
             initial={{ x: direction === "left" ? 150 : -150, opacity: 0 }}
@@ -231,8 +261,8 @@ export function Practice({
               {!flipped && currentNode && (
                 <Group
                   pos="absolute"
-                  top="5%"
-                  right="5%"
+                  top="4%"
+                  right="4%"
                   style={{ zIndex: 50 }}
                   gap="xs"
                 >
@@ -335,14 +365,14 @@ export function Practice({
             </Card>
           </motion.div>
           <Title size="h3" lts={1} fw={500}>
-            {curIdx} of {practiceList.size} flashcards
+            {curIdx} of {practiceList.size}
           </Title>
-        </Flex>
+        </>
       ) : (
-        <Title order={3} ta="center">
-          No flashcards to display
+        <Title size="h3" lts={1} fw={500}>
+          0 flashcards
         </Title>
       )}
-    </>
+    </Flex>
   );
 }

@@ -1,6 +1,7 @@
 import TrieFlashcard from "@/classes/TrieFlashcard";
 import { editFlashcard, fetchFlashcards } from "@/redux/flashcardSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { updatePracticeMode } from "@/redux/practiceSlice";
 import Flashcard from "@/types/Flashcard";
 import {
   ActionIcon,
@@ -48,6 +49,7 @@ export function Flashcards({
   const [displayedFlashcards, setDisplayedFlashcards] = useState<Flashcard[]>(
     []
   );
+  const [filterBy, setFilterBy] = useState<"all" | "favorites">("all");
   const frontTextTrie = new TrieFlashcard();
   const backTextTrie = new TrieFlashcard();
 
@@ -56,7 +58,7 @@ export function Flashcards({
   }, [deckId]);
 
   useEffect(() => {
-    flashcards.forEach((f) => {
+    displayedFlashcards.forEach((f) => {
       frontTextTrie.insert(f.frontText.toLowerCase(), f);
       backTextTrie.insert(f.backText.toLowerCase(), f);
     });
@@ -68,7 +70,11 @@ export function Flashcards({
       );
       setDisplayedFlashcards(uniqueFlashcards);
     } else {
-      setDisplayedFlashcards(flashcards);
+      if (filterBy === "favorites") {
+        setDisplayedFlashcards([...flashcards].filter((f) => f.favorited));
+      } else {
+        setDisplayedFlashcards(flashcards);
+      }
     }
   }, [search, flashcards]);
 
@@ -102,7 +108,9 @@ export function Flashcards({
     }
   };
 
-  const handleFilterBy = (type: string) => {
+  const handleFilterBy = (type: "all" | "favorites") => {
+    setFilterBy(type);
+    setSearch("");
     if (type === "all") {
       setDisplayedFlashcards(flashcards);
     } else {
@@ -116,7 +124,10 @@ export function Flashcards({
       <AppShell.Section>
         <Flex justify="space-between" align="center">
           <Flex
-            onClick={() => navigate("/dashboard")}
+            onClick={() => {
+              navigate("/dashboard");
+              dispatch(updatePracticeMode({ mode: null }));
+            }}
             direction="row"
             align="center"
             gap="xs"
