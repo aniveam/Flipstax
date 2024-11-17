@@ -1,7 +1,7 @@
 import DoublyLinkedList from "@/classes/DoublyLinkedList";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { editFlashcard } from "@/redux/flashcardSlice";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Node } from "@/types/Node";
 import { ActionIcon, Box, Card, Flex, Group, Text, Title } from "@mantine/core";
@@ -9,24 +9,26 @@ import { createSelector } from "@reduxjs/toolkit";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
 import { useEffect, useState } from "react";
-import { useAppDispatch } from "@/redux/hooks";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
 const selectSelectedDeck = (state: RootState) => state.decks.selectedDeck;
+const updatedFlashcard = (state: RootState) =>
+  state.flashcards.updatedFlashcard;
 
 // Create memoized selector
 const selectPracticeState = createSelector(
-  [selectMode, selectFlashcards, selectSelectedDeck],
-  (mode, flashcards, selectedDeck) => ({
+  [selectMode, selectFlashcards, selectSelectedDeck, updatedFlashcard],
+  (mode, flashcards, selectedDeck, updatedFlashcard) => ({
     mode,
     flashcards,
     selectedDeck,
+    updatedFlashcard,
   })
 );
 
 export function Practice() {
-  const { mode, flashcards, selectedDeck } =
+  const { mode, flashcards, selectedDeck, updatedFlashcard } =
     useAppSelector(selectPracticeState);
   const [practiceList, setPracticeList] = useState<DoublyLinkedList>(
     new DoublyLinkedList()
@@ -40,6 +42,20 @@ export function Practice() {
   useEffect(() => {
     initializeList();
   }, [mode, flashcards.length]);
+
+  useEffect(() => {
+    if (updatedFlashcard) {
+      const newFlashcard = practiceList.editNode(updatedFlashcard._id, {
+        ...updatedFlashcard,
+      });
+      // If we are updating the flashcard we are currently practicing, we need to re-render the currentNode
+      // to reflect the recent changes
+      if (currentNode && currentNode.flashcard?._id == newFlashcard?._id) {
+        currentNode.flashcard = newFlashcard;
+        setCurrentNode({ ...currentNode });
+      }
+    }
+  }, [updatedFlashcard]);
 
   const initializeList = () => {
     const list = new DoublyLinkedList();
@@ -113,9 +129,12 @@ export function Practice() {
               backText: curNode.flashcard.backText,
             })
           );
-          const updatedFlashcard = practiceList.editNode(curNode, {
-            favorited: !curNode.flashcard.favorited,
-          });
+          const updatedFlashcard = practiceList.editNode(
+            curNode.flashcard._id,
+            {
+              favorited: !curNode.flashcard.favorited,
+            }
+          );
           curNode.flashcard = updatedFlashcard;
           break;
         case "delete":
@@ -137,7 +156,9 @@ export function Practice() {
           gap="lg"
         >
           <Flex direction="row" gap="sm" align="center" justify="center">
-            <Title size="h2">{getTitle()}</Title>
+            <Title size="h2" lts={2} fw={500}>
+              {getTitle()}
+            </Title>
             <ActionIcon onClick={handleShuffle}>
               <i className="fa-solid fa-shuffle"></i>
             </ActionIcon>
@@ -165,10 +186,6 @@ export function Practice() {
             </MotionButton>
           </Group>
 
-          <Text>
-            {curIdx} of {practiceList.size} flashcards
-          </Text>
-
           <motion.div
             key={currentNode?.flashcard?._id}
             initial={{ x: direction === "left" ? 150 : -150, opacity: 0 }}
@@ -182,7 +199,7 @@ export function Practice() {
               shadow="sm"
               padding="lg"
               radius="md"
-              w={{ base: 350, md: 600, lg: 700 }}
+              w={{ base: 300, md: 600, lg: 700 }}
               h={{ base: 400, md: 500 }}
               bg="var(--mantine-color-blue-light)"
               data-dark-bg="var(--mantine-color-dark-8)"
@@ -199,7 +216,7 @@ export function Practice() {
                 <Group
                   pos="absolute"
                   top="5%"
-                  right="3%"
+                  right="5%"
                   style={{ zIndex: 50 }}
                   gap="xs"
                 >
@@ -287,6 +304,9 @@ export function Practice() {
               </Flex>
             </Card>
           </motion.div>
+          <Text fw={600} size="1.5rem">
+            {curIdx} of {practiceList.size} flashcards
+          </Text>
         </Flex>
       ) : (
         <Title order={3} ta="center">

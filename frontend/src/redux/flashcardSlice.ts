@@ -4,12 +4,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface FlashcardState {
   flashcards: Flashcard[];
+  updatedFlashcard: Flashcard | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: FlashcardState = {
   flashcards: [],
+  updatedFlashcard: null,
   loading: false,
   error: null,
 };
@@ -121,6 +123,7 @@ const flashcardSlice = createSlice({
           );
           if (index !== -1) {
             state.flashcards[index] = action.payload;
+            state.updatedFlashcard = state.flashcards[index];
           }
           state.flashcards.sort((a, b) => {
             return (

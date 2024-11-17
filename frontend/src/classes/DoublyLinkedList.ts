@@ -33,14 +33,9 @@ class DoublyLinkedList {
     this.nodeMap.set(flashcard._id, newNode);
     this.size += 1;
   }
-  editNode(node: Node | null, updates: Partial<Flashcard>): Flashcard | null {
-    // If node is null or doesn't have a flashcard, return null
-    if (!node?.flashcard) {
-      return null;
-    }
-
-    if (this.nodeMap.has(node.flashcard._id)) {
-      const updateNode = this.nodeMap.get(node.flashcard._id)!;
+  editNode(flashcardId: string, updates: Partial<Flashcard>): Flashcard | null {
+    if (this.nodeMap.has(flashcardId)) {
+      const updateNode = this.nodeMap.get(flashcardId)!;
 
       updateNode.flashcard = {
         ...updateNode.flashcard, // Spread existing properties
