@@ -33,6 +33,24 @@ class DoublyLinkedList {
     this.nodeMap.set(flashcard._id, newNode);
     this.size += 1;
   }
+  editNode(node: Node | null, updates: Partial<Flashcard>): Flashcard | null {
+    // If node is null or doesn't have a flashcard, return null
+    if (!node?.flashcard) {
+      return null;
+    }
+
+    if (this.nodeMap.has(node.flashcard._id)) {
+      const updateNode = this.nodeMap.get(node.flashcard._id)!;
+
+      updateNode.flashcard = {
+        ...updateNode.flashcard, // Spread existing properties
+        ...updates, // Spread new updates over existing properties
+      } as Flashcard; // Tell TypeScript to trust us that all required fields are present
+
+      return updateNode.flashcard;
+    }
+    return null;
+  }
   // Remove from front of list
   removeFront(): Flashcard | null {
     if (this.size === 0) {

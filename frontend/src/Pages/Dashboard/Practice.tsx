@@ -1,5 +1,6 @@
 import DoublyLinkedList from "@/classes/DoublyLinkedList";
 import { MotionButton } from "@/components/ui/MotionButton";
+import { editFlashcard } from "@/redux/flashcardSlice";
 import { useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
 import { Node } from "@/types/Node";
@@ -8,6 +9,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
 import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/redux/hooks";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
@@ -33,10 +35,11 @@ export function Practice() {
   const [currentNode, setCurrentNode] = useState<Node | null>(null);
   const [flipped, setFlipped] = useState<boolean>(false);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     initializeList();
-  }, [mode, flashcards]);
+  }, [mode, flashcards.length]);
 
   const initializeList = () => {
     const list = new DoublyLinkedList();
@@ -90,6 +93,37 @@ export function Practice() {
     initializeList();
     setCurIdx(1);
     setFlipped(false);
+  };
+
+  const handleFlashcardClick = (
+    type: string,
+    curNode: Node | null,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+
+    if (curNode && curNode.flashcard) {
+      switch (type) {
+        case "favorite":
+          dispatch(
+            editFlashcard({
+              _id: curNode.flashcard._id,
+              favoriteStatus: !curNode.flashcard.favorited,
+              frontText: curNode.flashcard.frontText,
+              backText: curNode.flashcard.backText,
+            })
+          );
+          const updatedFlashcard = practiceList.editNode(curNode, {
+            favorited: !curNode.flashcard.favorited,
+          });
+          curNode.flashcard = updatedFlashcard;
+          break;
+        case "delete":
+          break;
+        case "edit":
+          break;
+      }
+    }
   };
 
   return (
@@ -161,7 +195,7 @@ export function Practice() {
               }}
               pos="relative"
             >
-              {!flipped && (
+              {!flipped && currentNode && (
                 <Group
                   pos="absolute"
                   top="5%"
@@ -173,15 +207,22 @@ export function Practice() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ActionIcon color="yellow" size="sm" variant="light">
-                      {currentNode?.flashcard?.favorited ? (
+                    <ActionIcon
+                      onClick={(e) =>
+                        handleFlashcardClick("favorite", currentNode, e)
+                      }
+                      color="yellow"
+                      size="md"
+                      variant="light"
+                    >
+                      {currentNode.flashcard?.favorited ? (
                         <i
                           style={{ fontSize: "12px" }}
                           className="fa-solid fa-star"
                         ></i>
                       ) : (
                         <i
-                          style={{ fontSize: "12px" }}
+                          style={{ fontSize: "14px" }}
                           className="fa-regular fa-star"
                         ></i>
                       )}
@@ -191,10 +232,10 @@ export function Practice() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ActionIcon color="green" size="sm" variant="light">
+                    <ActionIcon color="green" size="md" variant="light">
                       <i
                         className="fa fa-pencil-square-o"
-                        style={{ fontSize: "12px" }}
+                        style={{ fontSize: "14px" }}
                       ></i>
                     </ActionIcon>
                   </motion.div>
@@ -202,10 +243,10 @@ export function Practice() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ActionIcon color="red" size="sm" variant="light">
+                    <ActionIcon color="red" size="md" variant="light">
                       <i
                         className="fa fa-trash-o"
-                        style={{ fontSize: "12px" }}
+                        style={{ fontSize: "14px" }}
                       ></i>
                     </ActionIcon>
                   </motion.div>
