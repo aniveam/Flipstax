@@ -3,12 +3,13 @@ import { MotionButton } from "@/components/ui/MotionButton";
 import { editFlashcard } from "@/redux/flashcardSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RootState } from "@/redux/store";
+import Flashcard from "@/types/Flashcard";
 import { Node } from "@/types/Node";
 import { ActionIcon, Box, Card, Flex, Group, Text, Title } from "@mantine/core";
 import { createSelector } from "@reduxjs/toolkit";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
 const selectMode = (state: RootState) => state.practice.mode;
 const selectFlashcards = (state: RootState) => state.flashcards.flashcards;
@@ -27,7 +28,19 @@ const selectPracticeState = createSelector(
   })
 );
 
-export function Practice() {
+interface PracticeProps {
+  setFlashcard: React.Dispatch<SetStateAction<Flashcard | null>>;
+  setFlashcardMode: React.Dispatch<
+    SetStateAction<"create" | "edit" | "delete" | "">
+  >;
+  toggleFlashcardModal: () => void;
+}
+
+export function Practice({
+  setFlashcard,
+  setFlashcardMode,
+  toggleFlashcardModal,
+}: PracticeProps) {
   const { mode, flashcards, selectedDeck, updatedFlashcard } =
     useAppSelector(selectPracticeState);
   const [practiceList, setPracticeList] = useState<DoublyLinkedList>(
@@ -119,6 +132,7 @@ export function Practice() {
     e.stopPropagation();
 
     if (curNode && curNode.flashcard) {
+      setFlashcard(curNode.flashcard);
       switch (type) {
         case "favorite":
           dispatch(
@@ -131,15 +145,15 @@ export function Practice() {
           );
           const updatedFlashcard = practiceList.editNode(
             curNode.flashcard._id,
-            {
-              favorited: !curNode.flashcard.favorited,
-            }
+            { favorited: !curNode.flashcard.favorited }
           );
           curNode.flashcard = updatedFlashcard;
           break;
-        case "delete":
-          break;
         case "edit":
+          setFlashcardMode("edit");
+          toggleFlashcardModal();
+          break;
+        case "delete":
           break;
       }
     }
@@ -249,7 +263,14 @@ export function Practice() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ActionIcon color="green" size="md" variant="light">
+                    <ActionIcon
+                      onClick={(e) =>
+                        handleFlashcardClick("edit", currentNode, e)
+                      }
+                      color="green"
+                      size="md"
+                      variant="light"
+                    >
                       <i
                         className="fa fa-pencil-square-o"
                         style={{ fontSize: "14px" }}

@@ -39,7 +39,7 @@ export function Home() {
     ""
   );
 
-  //Flashcards
+  // Flashcards
   const [flashcardOpened, setFlashcardOpened] = useState<boolean>(false);
   const toggleFlashcardModal = () => setFlashcardOpened(!flashcardOpened);
   const [flashcardMode, setFlashcardMode] = useState<
@@ -47,12 +47,20 @@ export function Home() {
   >("");
   const [flashcard, setFlashcard] = useState<Flashcard | null>(null);
 
-  //Practice
+  // Practice
   const [practiceOpened, setPracticeOpened] = useState<boolean>(false);
   const togglePracticeModal = () => setPracticeOpened(!practiceOpened);
   const { mode } = useAppSelector((state) => state.practice);
   const practiceContent = useMemo(() => {
-    return mode ? <Practice /> : <p>No Flashcards selected to Practice</p>;
+    return mode ? (
+      <Practice
+        setFlashcard={setFlashcard}
+        setFlashcardMode={setFlashcardMode}
+        toggleFlashcardModal={toggleFlashcardModal}
+      />
+    ) : (
+      <p>No Flashcards selected to Practice</p>
+    );
   }, [mode]);
 
   useEffect(() => {
