@@ -1,3 +1,4 @@
+import TrieFlashcard from "@/classes/TrieFlashcard";
 import { editFlashcard, fetchFlashcards } from "@/redux/flashcardSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
@@ -9,13 +10,15 @@ import {
   Card,
   Flex,
   Group,
+  Menu,
   ScrollArea,
   Text,
+  TextInput,
   Title,
 } from "@mantine/core";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface FlashcardProps {
@@ -41,10 +44,33 @@ export function Flashcards({
   const navigate = useNavigate();
   const { flashcards } = useAppSelector((state) => state.flashcards);
   const { selectedDeck } = useAppSelector((state) => state.decks);
+  const [search, setSearch] = useState<string>("");
+  const [displayedFlashcards, setDisplayedFlashcards] = useState<Flashcard[]>(
+    []
+  );
+  const frontTextTrie = new TrieFlashcard();
+  const backTextTrie = new TrieFlashcard();
 
   useEffect(() => {
     dispatch(fetchFlashcards({ deckId }));
   }, [deckId]);
+
+  useEffect(() => {
+    flashcards.forEach((f) => {
+      frontTextTrie.insert(f.frontText.toLowerCase(), f);
+      backTextTrie.insert(f.backText.toLowerCase(), f);
+    });
+    if (search.trim()) {
+      const resultsFront = frontTextTrie.startsWith(search.toLowerCase());
+      const resultsBack = backTextTrie.startsWith(search.toLowerCase());
+      const uniqueFlashcards = Array.from(
+        new Set([...resultsFront, ...resultsBack])
+      );
+      setDisplayedFlashcards(uniqueFlashcards);
+    } else {
+      setDisplayedFlashcards(flashcards);
+    }
+  }, [search, flashcards]);
 
   const handleFlashcardClick = (
     type: string,
@@ -73,6 +99,15 @@ export function Flashcards({
           })
         );
         break;
+    }
+  };
+
+  const handleFilterBy = (type: string) => {
+    if (type === "all") {
+      setDisplayedFlashcards(flashcards);
+    } else {
+      const favoriteCards = [...flashcards].filter((f) => f.favorited);
+      setDisplayedFlashcards(favoriteCards);
     }
   };
 
@@ -107,7 +142,7 @@ export function Flashcards({
         </Flex>
       </AppShell.Section>
       <AppShell.Section
-        mt={16}
+        my={16}
         style={{ display: "flex", justifyContent: "center" }}
       >
         <Button
@@ -119,9 +154,44 @@ export function Flashcards({
           Practice
         </Button>
       </AppShell.Section>
+      <AppShell.Section>
+        <Flex p={5} direction="row" w="100%" align="center" gap="sm">
+          <TextInput
+            value={search}
+            w="90%"
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search flashcards..."
+          />
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <ActionIcon color="cyan" size="md" variant="light">
+                <i
+                  className="fa-solid fa-filter"
+                  style={{ fontSize: "14px" }}
+                ></i>
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>Filter By</Menu.Label>
+              <Menu.Item
+                onClick={() => handleFilterBy("all")}
+                leftSection={<i className="fa-solid fa-list"></i>}
+              >
+                All flashcards
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => handleFilterBy("favorites")}
+                leftSection={<i className="fa-solid fa-star"></i>}
+              >
+                Favorite flashcards
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Flex>
+      </AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         <Flex direction="column" gap="md" m={5}>
-          {flashcards.map((flashcard: Flashcard) => (
+          {displayedFlashcards.map((flashcard: Flashcard) => (
             <motion.div
               onClick={(e) => handleFlashcardClick("edit", flashcard, e)}
               key={flashcard._id}
