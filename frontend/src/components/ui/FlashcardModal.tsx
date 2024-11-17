@@ -137,7 +137,10 @@ export function FlashcardModal({
     <>
       <Modal
         opened={flashcardOpened}
-        onClose={toggleFlashcardModal}
+        onClose={() => {
+          toggleFlashcardModal();
+          setErrorMsg(null);
+        }}
         title={getTitle()}
       >
         {errorMsg && (

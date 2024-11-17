@@ -154,6 +154,8 @@ export function Practice({
           toggleFlashcardModal();
           break;
         case "delete":
+          setFlashcardMode("delete");
+          toggleFlashcardModal();
           break;
       }
     }
@@ -281,7 +283,14 @@ export function Practice({
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ActionIcon color="red" size="md" variant="light">
+                    <ActionIcon
+                      onClick={(e) =>
+                        handleFlashcardClick("delete", currentNode, e)
+                      }
+                      color="red"
+                      size="md"
+                      variant="light"
+                    >
                       <i
                         className="fa fa-trash-o"
                         style={{ fontSize: "14px" }}
@@ -325,9 +334,9 @@ export function Practice({
               </Flex>
             </Card>
           </motion.div>
-          <Text fw={600} size="1.5rem">
+          <Title size="h3" lts={1} fw={500}>
             {curIdx} of {practiceList.size} flashcards
-          </Text>
+          </Title>
         </Flex>
       ) : (
         <Title order={3} ta="center">
