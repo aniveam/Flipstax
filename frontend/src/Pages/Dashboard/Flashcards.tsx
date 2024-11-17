@@ -242,7 +242,7 @@ export function Flashcards({
                         onClick={(e) =>
                           handleFlashcardClick("favorite", flashcard, e)
                         }
-                        color="yellow"
+                        color={flashcard.favorited ? "yellow" : "gray"}
                         size="sm"
                         variant="light"
                       >

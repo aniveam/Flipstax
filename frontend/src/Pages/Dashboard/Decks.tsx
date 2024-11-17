@@ -1,3 +1,4 @@
+import TrieDeck from "@/classes/TrieDeck";
 import { editDeck, updateSelectedDeck } from "@/redux/deckSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Deck from "@/types/Deck";
@@ -8,12 +9,14 @@ import {
   Card,
   Flex,
   Group,
+  Menu,
   ScrollArea,
   Text,
+  TextInput,
   Title,
 } from "@mantine/core";
 import { motion } from "framer-motion";
-import { SetStateAction } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface DeckProps {
@@ -32,11 +35,41 @@ export function Decks({
   const { decks } = useAppSelector((state) => state.decks);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [search, setSearch] = useState<string>("");
+  const [filterBy, setFilterBy] = useState<"all" | "pinned">("all");
+  const [displayedDecks, setDisplayedDecks] = useState<Deck[]>([]);
+  const deckTrie = new TrieDeck();
 
   const icons = {
     pin: ["fa-solid fa-thumbtack", "blue", "yellow"],
     edit: ["fa fa-pencil-square-o", "green"],
     delete: ["fa fa-trash-o", "red"],
+  };
+
+  useEffect(() => {
+    displayedDecks.forEach((dd) =>
+      deckTrie.insertNode(dd.name.toLowerCase(), dd)
+    );
+    if (search.trim()) {
+      const results = deckTrie.startsWith(search.toLowerCase().trim());
+      setDisplayedDecks(results);
+    } else {
+      if (filterBy === "pinned") {
+        setDisplayedDecks([...decks].filter((d) => d.pinned));
+      } else {
+        setDisplayedDecks(decks);
+      }
+    }
+  }, [search, decks]);
+
+  const handleFilterBy = (type: "all" | "pinned") => {
+    setFilterBy(type);
+    if (type === "pinned") {
+      const pinnedDecks = [...decks].filter((d) => d.pinned);
+      setDisplayedDecks(pinnedDecks);
+    } else {
+      setDisplayedDecks(decks);
+    }
   };
 
   const handleDeckClick = (deck: Deck, mode: string, e: React.MouseEvent) => {
@@ -84,9 +117,41 @@ export function Decks({
           </Button>
         </Flex>
       </AppShell.Section>
+      <AppShell.Section>
+        <Flex mt={16} p={5} dir="row" align="center" w="100%" gap="md">
+          <TextInput
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search decks..."
+            w="90%"
+          />
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <ActionIcon size="md">
+                <i className="fa-solid fa-filter"></i>
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>Filter by</Menu.Label>
+              <Menu.Item
+                onClick={() => handleFilterBy("all")}
+                leftSection={<i className="fa-solid fa-list"></i>}
+              >
+                All decks
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => handleFilterBy("pinned")}
+                leftSection={<i className="fa-solid fa-thumbtack"></i>}
+              >
+                Pinned decks
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Flex>
+      </AppShell.Section>
       <AppShell.Section grow my="md" component={ScrollArea}>
         <Flex direction="column" gap="md" m={5}>
-          {decks.map((deck: Deck) => (
+          {displayedDecks.map((deck: Deck) => (
             <motion.div
               key={deck._id}
               whileHover={{

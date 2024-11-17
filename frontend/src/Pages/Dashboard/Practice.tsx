@@ -274,7 +274,9 @@ export function Practice({
                       onClick={(e) =>
                         handleFlashcardClick("favorite", currentNode, e)
                       }
-                      color="yellow"
+                      color={
+                        currentNode.flashcard?.favorited ? "yellow" : "gray"
+                      }
                       size="md"
                       variant="light"
                     >

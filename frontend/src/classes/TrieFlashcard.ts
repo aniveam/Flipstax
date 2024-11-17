@@ -19,7 +19,7 @@ class TrieFlashcard {
     this.root = new TrieNode();
   }
 
-  insert(text: string, flashcard: Flashcard) {
+  insert(text: string, flashcard: Flashcard): void {
     let curr = this.root;
     for (const char of text) {
       if (!curr.children.has(char)) {
