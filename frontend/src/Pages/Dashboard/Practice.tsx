@@ -107,7 +107,7 @@ export function Practice({
       mode === "favorites"
         ? [...flashcards].filter((flashcard) => flashcard.favorited)
         : flashcards;
-    filteredFlashcards.forEach((flashcard) => list.insert(flashcard));
+    filteredFlashcards.forEach((flashcard: Flashcard) => list.insert(flashcard));
     setPracticeList(list);
     setCurrentNode(list.getFront());
     setCurIdx(1);
