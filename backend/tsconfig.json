@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "target": "es2016",
+    "target": "ES2020",
     "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
     "strict": true,
-    "skipLibCheck": true,
-    "types": ["node"],
-    "rootDir": "./src"
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "ts-node": {
     "files": true
   },
+  "files": ["./src/app.ts"],
   "include": ["src/**/*.ts"]
 }
