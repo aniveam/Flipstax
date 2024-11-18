@@ -4,7 +4,7 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "app.ts"
+    "dev": "ts-node app.ts"
   },
   "keywords": [],
   "author": "",
