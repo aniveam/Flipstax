@@ -4,9 +4,7 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node dist/app.js",
-    "dev": "nodemon --exec ts-node app.ts"
+    "dev": "ts-node app.ts"
   },
   "keywords": [],
   "author": "",
