@@ -27,5 +27,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "./node_modules/redux-persist/types"]
+  "include": ["src", "./node_modules/redux-persist/types"],
+  "types": [ "node" ]
 }
