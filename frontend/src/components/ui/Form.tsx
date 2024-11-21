@@ -118,7 +118,7 @@ export function Form({ type }: FormProps) {
         <Box
           component="form"
           onSubmit={handleSubmit}
-          w={500}
+          w={{base: 300, md: 500}}
           className={`${
             colorScheme === "light" ? classes.light : classes.dark
           } ${classes.box}`}

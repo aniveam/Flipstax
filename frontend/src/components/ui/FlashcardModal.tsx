@@ -72,10 +72,10 @@ export function FlashcardModal({
           dispatch(
             editFlashcard({
               _id: flashcard._id,
-              favoriteStatus: flashcard.favorited,
+              favorited: flashcard.favorited,
               frontText,
               backText,
-            })
+            } as Flashcard)
           );
         } else if (mode === "delete") {
           dispatch(deleteFlashcard({ _id: flashcard._id }));
