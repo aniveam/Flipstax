@@ -2,6 +2,8 @@
 
 A modern and feature-rich flashcard application built using the MERN stack. This app helps users master concepts efficiently through organized decks, flexible practice modes, and intelligent algorithms.
 
+**Currently hosted at:** [https://flipstax.vercel.app/](https://flipstax.vercel.app/) 🌐
+
 ## Features 🎉
 
 - **User Authentication 🔒**
