@@ -75,7 +75,7 @@ export function Home() {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 70 }}
       navbar={{
         width: 400,
         breakpoint: "sm",
