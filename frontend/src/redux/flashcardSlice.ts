@@ -19,7 +19,7 @@ const initialState: FlashcardState = {
 };
 
 export const fetchFlashcards = createAsyncThunk<
-  {flashcards: Flashcard[], deckName: string},
+  { flashcards: Flashcard[]; deckName: string },
   { deckId: string }
 >("flashcards/fetchFlashcards", async ({ deckId }) => {
   const response = await api.get("/flashcards", {
@@ -42,17 +42,27 @@ export const createFlashcard = createAsyncThunk<
   return response.data;
 });
 
-export const editFlashcard = createAsyncThunk<
-  Flashcard,
-  { _id: string; favoriteStatus: boolean; frontText: string; backText: string }
->(
+export const editFlashcard = createAsyncThunk<Flashcard, Flashcard>(
   "flashcards/editFlashcard",
-  async ({ _id, favoriteStatus, frontText, backText }) => {
+  async ({
+    _id,
+    favorited,
+    frontText,
+    backText,
+    lastReviewed,
+    repetitions,
+    easeFactor,
+    interval,
+  }) => {
     const response = await api.put("/flashcards", {
       flashcardId: _id,
-      favorited: favoriteStatus,
+      favorited,
       frontText,
       backText,
+      lastReviewed,
+      repetitions,
+      easeFactor,
+      interval,
     });
     return response.data;
   }
@@ -81,7 +91,10 @@ const flashcardSlice = createSlice({
       })
       .addCase(
         fetchFlashcards.fulfilled,
-        (state, action: PayloadAction<{flashcards: Flashcard[], deckName: string}>) => {
+        (
+          state,
+          action: PayloadAction<{ flashcards: Flashcard[]; deckName: string }>
+        ) => {
           state.loading = false;
           state.flashcards = action.payload.flashcards.sort((a, b) => {
             return (

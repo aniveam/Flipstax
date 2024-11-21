@@ -99,10 +99,10 @@ export function Flashcards({
         dispatch(
           editFlashcard({
             _id: flashcard._id,
-            favoriteStatus: !flashcard.favorited,
+            favorited: !flashcard.favorited,
             frontText: flashcard.frontText,
             backText: flashcard.backText,
-          })
+          } as Flashcard)
         );
         break;
     }

@@ -1,4 +1,5 @@
 import DoublyLinkedList from "@/classes/DoublyLinkedList";
+import SpacedRepetition from "@/classes/SpacedRepetition";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { editFlashcard } from "@/redux/flashcardSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -50,6 +51,16 @@ export function Practice({
   const [currentNode, setCurrentNode] = useState<Node | null>(null);
   const [flipped, setFlipped] = useState<boolean>(false);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
+  const [spacedRep, setSpacedRep] = useState<SpacedRepetition>(
+    new SpacedRepetition(flashcards)
+  );
+  const smiles = [
+    "fa-regular fa-face-frown",
+    "fa-regular fa-face-frown-open",
+    "fa-regular fa-face-meh",
+    "fa-regular fa-face-smile",
+    "fa-regular fa-face-grin-beam",
+  ];
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -57,57 +68,79 @@ export function Practice({
   }, [mode, flashcards.length]);
 
   useEffect(() => {
-    if (updatedFlashcard) {
-      const newFlashcard = practiceList.editNode(updatedFlashcard._id, {
-        ...updatedFlashcard,
-      });
-      // If we are updating the flashcard we are currently practicing, we need to re-render the currentNode to reflect the recent changes
-      if (currentNode && currentNode.flashcard?._id == newFlashcard?._id) {
-        const updatedNode = { ...currentNode, flashcard: newFlashcard };
-        setCurrentNode(updatedNode);
-      }
-      //Favorites Mode
-      if (mode === "favorites") {
-        const newList = practiceList.clone();
+    if (!updatedFlashcard) {
+      return;
+    }
+    const newList = practiceList.clone();
+    const isCurrent = currentNode?.flashcard?._id === updatedFlashcard._id;
 
-        if (!updatedFlashcard.favorited) {
-          //Flashcard is no longer favorited
-          newList.deleteNode(updatedFlashcard._id);
-          setPracticeList(newList);
-          if (
-            currentNode &&
-            currentNode.flashcard?._id == updatedFlashcard._id
-          ) {
-            setCurrentNode(newList.getFront());
-            if (curIdx === newList.size) {
-              setCurIdx((prev) => prev - 1);
-            }
-          }
-        } else {
-          // If we already have this in our list, just change the flashcard, otherwise we insert it
-          const existingNode = newList.nodeMap.get(updatedFlashcard._id);
-          if (existingNode) {
-            existingNode.flashcard = updatedFlashcard;
-          } else {
-            newList.insert(updatedFlashcard);
-          }
-          setPracticeList(newList);
-          if (!currentNode) {
-            setCurrentNode(newList.getFront());
+    const updatedNode = practiceList.editNode(
+      updatedFlashcard._id,
+      updatedFlashcard
+    );
+
+    // If we are updating the flashcard we are currently practicing, we need to re-render the currentNode to reflect the recent changes
+    if (isCurrent) {
+      setCurrentNode({ ...currentNode, flashcard: updatedNode });
+    }
+
+    const handleFavoritesMode = () => {
+      if (!updatedFlashcard.favorited) {
+        // Remove from favorites
+        newList.deleteNode(updatedFlashcard._id);
+        if (isCurrent) {
+          setCurrentNode(newList.getFront());
+          if (curIdx === newList.size) {
+            setCurIdx((prev) => prev - 1);
           }
         }
-        setCurIdx(newList.getCurIdx(currentNode));
+      } else {
+        // Add or update the flashcard
+        const existingNode = newList.nodeMap.get(updatedFlashcard._id);
+        if (existingNode) {
+          existingNode.flashcard = updatedFlashcard;
+        } else {
+          newList.insert(updatedFlashcard);
+        }
+        if (!currentNode) {
+          setCurrentNode(newList.getFront());
+        }
       }
+    };
+
+    const handleSpacedRepetitionMode = () => {
+      newList.deleteNode(updatedFlashcard._id);
+      setCurrentNode(newList.getFront());
+      setFlipped(false);
+    };
+
+    if (mode === "favorites") {
+      handleFavoritesMode();
+    } else if (mode === "spaced") {
+      handleSpacedRepetitionMode();
     }
+
+    setPracticeList(newList);
+    setCurIdx(newList.getCurIdx(currentNode));
   }, [updatedFlashcard]);
+
+  const getSpacedRepetitionCards = (orgCards: Flashcard[]) => {
+    setSpacedRep(new SpacedRepetition(orgCards));
+    const finalCards = spacedRep.getDueFlashcards();
+    return finalCards;
+  };
 
   const initializeList = () => {
     const list = new DoublyLinkedList();
     const filteredFlashcards =
       mode === "favorites"
         ? [...flashcards].filter((flashcard) => flashcard.favorited)
+        : mode === "spaced"
+        ? getSpacedRepetitionCards([...flashcards])
         : flashcards;
-    filteredFlashcards.forEach((flashcard: Flashcard) => list.insert(flashcard));
+    filteredFlashcards.forEach((flashcard: Flashcard) =>
+      list.insert(flashcard)
+    );
     setPracticeList(list);
     setCurrentNode(list.getFront());
     setCurIdx(1);
@@ -119,6 +152,8 @@ export function Practice({
         return "All Flashcards: " + deckName;
       case "favorites":
         return "Favorite Flashcards: " + deckName;
+      case "spaced":
+        return "Spaced Repetition: " + deckName;
       default:
         return deckName || "";
     }
@@ -168,11 +203,12 @@ export function Practice({
         case "favorite":
           dispatch(
             editFlashcard({
+              ...curNode.flashcard,
               _id: curNode.flashcard._id,
-              favoriteStatus: !curNode.flashcard.favorited,
+              favorited: !curNode.flashcard.favorited,
               frontText: curNode.flashcard.frontText,
               backText: curNode.flashcard.backText,
-            })
+            } as Flashcard)
           );
           const updatedFlashcard = practiceList.editNode(
             curNode.flashcard._id,
@@ -190,6 +226,16 @@ export function Practice({
           break;
       }
     }
+  };
+
+  const handleSmileyClick = (
+    e: React.MouseEvent,
+    flashcard: Flashcard,
+    quality: number
+  ) => {
+    e.stopPropagation();
+    const updatedCard = spacedRep.updateCard(flashcard, quality);
+    dispatch(editFlashcard({ ...updatedCard })); //Triggers useEffect when we update the card
   };
 
   return (
@@ -337,8 +383,9 @@ export function Practice({
                 style={{
                   transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
                   transition: "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  paddingBottom: "70px", // Space for smileys at the bottom
                   overflowY: "auto",
-                  height: "100%",
+                  height: "calc(100% - 70px)", // Make sure there's room for smileys at the bottom
                 }}
               >
                 <Box mah="100%">
@@ -364,6 +411,43 @@ export function Practice({
                   </Text>
                 </Box>
               </Flex>
+              {flipped && (
+                <Flex
+                  direction="column"
+                  gap="sm"
+                  pos="absolute"
+                  bottom="10px"
+                  left="50%"
+                  style={{
+                    transform: `translateX(-50%) ${
+                      flipped ? "rotateY(180deg)" : "rotateY(0deg)"
+                    }`,
+                    zIndex: 10,
+                  }}
+                >
+                  <Text ta="center" display="block" size="0.75rem">
+                    How well did you know this?
+                  </Text>
+                  <Group>
+                    {smiles.map((sm, index) => (
+                      <motion.div
+                        onClick={(e) =>
+                          handleSmileyClick(
+                            e,
+                            currentNode?.flashcard!,
+                            index + 1
+                          )
+                        }
+                        key={index}
+                        whileHover={{ scale: 1.2 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <i className={sm} style={{ fontSize: "25px" }}></i>
+                      </motion.div>
+                    ))}
+                  </Group>
+                </Flex>
+              )}
             </Card>
           </motion.div>
           <Title size="h3" lts={1} fw={500}>

@@ -47,11 +47,28 @@ const createFlashcard = async (req: AuthenticatedRequest, res: Response) => {
 const editFlashcard = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { flashcardId, favorited, frontText, backText } = req.body;
+    const {
+      flashcardId,
+      favorited,
+      frontText,
+      backText,
+      lastReviewed,
+      repetitions,
+      easeFactor,
+      interval,
+    } = req.body;
     if (userId) {
       const flashcard = await Flashcard.findOneAndUpdate(
         { _id: flashcardId },
-        { favorited, frontText, backText },
+        {
+          favorited,
+          frontText,
+          backText,
+          lastReviewed,
+          repetitions,
+          easeFactor,
+          interval,
+        },
         { new: true }
       );
       res.status(200).json(flashcard);
