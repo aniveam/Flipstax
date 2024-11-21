@@ -78,6 +78,12 @@ const deleteDeck = async (req: AuthenticatedRequest, res: Response) => {
     if (userId) {
       const { deckId } = req.body;
       const deck = await Deck.findByIdAndDelete({ _id: deckId });
+      if (!deck) {
+        res.status(404).json({ error: "Deck not found or not authorized" });
+        return;
+      }
+      // Delete associated flashcards
+      await Flashcard.deleteMany({ deckId: deckId });
       res.status(200).json(deck);
     } else {
       res.status(400).json({ error: "User not authenticated" });

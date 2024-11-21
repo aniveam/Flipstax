@@ -257,25 +257,26 @@ export function Practice({
           <i className="fa fa-refresh" aria-hidden="true"></i>
         </ActionIcon>
       </Flex>
-
-      <Group>
-        <MotionButton
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-          color="gray"
-          onClick={() => handleClick("prev")}
-        >
-          Prev
-        </MotionButton>
-        <MotionButton
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-          color="cyan"
-          onClick={() => handleClick("next")}
-        >
-          Next
-        </MotionButton>
-      </Group>
+      {mode !== "spaced" && (
+        <Group>
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+            color="gray"
+            onClick={() => handleClick("prev")}
+          >
+            Prev
+          </MotionButton>
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+            color="cyan"
+            onClick={() => handleClick("next")}
+          >
+            Next
+          </MotionButton>
+        </Group>
+      )}
       {practiceList.size > 0 ? (
         <>
           <motion.div
@@ -411,7 +412,7 @@ export function Practice({
                   </Text>
                 </Box>
               </Flex>
-              {flipped && (
+              {flipped && mode === "spaced" && (
                 <Flex
                   direction="column"
                   gap="sm"
