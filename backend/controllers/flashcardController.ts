@@ -28,7 +28,6 @@ const createFlashcard = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (userId) {
       const { deckId, frontText, backText } = req.body;
-      console.log(deckId, frontText, backText);
       const flashcard = await Flashcard.create({
         deckId,
         frontText,

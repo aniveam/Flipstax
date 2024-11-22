@@ -59,7 +59,7 @@ export function Home() {
         toggleFlashcardModal={toggleFlashcardModal}
       />
     ) : (
-      <Title ta="center" size="h2" lts={2} fw={500}>
+      <Title ta="center" size="h4" lts={2} fw={500}>
         No flashcards selected to practice
       </Title>
     );
