@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { MotionLink } from "@/components/ui/MotionLink";
-import { color, motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 import {
   Badge,
@@ -16,8 +16,6 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-
-import classes from "@/modules/Flipstax.module.css";
 
 export function Main() {
   const { colorScheme } = useMantineColorScheme();
