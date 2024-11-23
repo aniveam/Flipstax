@@ -138,8 +138,8 @@ export function Main() {
               transition={{ duration: 0.9, delay: 0.1 }}
             >
               <Text
-                size={isSmallScreen ? "sm" : "xl"}
-                fw={450}
+                size={isSmallScreen ? "md" : "xl"}
+                fw={500}
                 ta="center"
                 style={{
                   fontFamily: "Inter, sans-serif",
@@ -231,8 +231,8 @@ export function Main() {
 
           {/* Subtitle */}
           <Title
-            size={isSmallScreen ? "sm" : "xl"}
-            fw={450}
+            size={isSmallScreen ? "md" : "xl"}
+            fw={500}
             ta="center"
             style={{
               fontFamily: "Inter, sans-serif",
@@ -255,7 +255,7 @@ export function Main() {
                 <Title
                   mb="lg"
                   ta="center"
-                  size={isSmallScreen ? "sm" : "xl"}
+                  size={isSmallScreen ? "md" : "xl"}
                   fw={400}
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
@@ -330,17 +330,12 @@ export function Main() {
         <Container size="md">
           <Stack gap={50} align="center">
             <Stack gap="md" align="center">
-              <Badge
-                variant="outline"
-                color="gray"
-                size="md"
-                style={{ fontSize: theme.fontSizes.md }}
-              >
+              <Badge variant="outline" color="gray" size="lg" radius="lg">
                 Packed with Features
               </Badge>
               <Title
                 order={1}
-                size={isSmallScreen ? "2rem" : "4rem"} // Reduced size for small screens
+                size={isSmallScreen ? "2rem" : "4rem"}
                 ta="center"
                 style={{
                   letterSpacing: "-0.02em",
@@ -368,7 +363,7 @@ export function Main() {
                   <Flex
                     direction={isSmallScreen ? "column" : "row"}
                     gap="md"
-                    align="center"
+                    align={isSmallScreen ? "center" : "start"}
                   >
                     <ActionIcon
                       variant="light"
