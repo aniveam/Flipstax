@@ -5,17 +5,33 @@ import {
   Flex,
   Grid,
   Image,
+  Menu,
   Text,
   Title,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 
 export function Navbar() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
   });
   const theme = useMantineTheme();
+  const isSmallScreen = useMediaQuery("(max-width: 768px)");
+
+  const handleScroll = (id: string) => {
+    const section = document.getElementById(id);
+    if (section) {
+      const elementPosition = section.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - 80;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <Box
@@ -46,31 +62,103 @@ export function Navbar() {
             </Title>
           </Flex>
         </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4 }}>
-          <Flex justify="center" align="center" gap="xl">
-            <Text fw={500}>Home</Text>
-            <Text fw={500}>How It Works</Text>
+
+        <Grid.Col span={{ base: 10, md: 4 }}>
+          <Flex
+            justify={isSmallScreen ? "flex-start" : "center"}
+            align="center"
+            gap={isSmallScreen ? "md" : "xl"}
+          >
+            <Text
+              fw={500}
+              onClick={() => handleScroll("home")}
+              style={{ cursor: "pointer" }}
+            >
+              Home
+            </Text>
+            <Text
+              fw={500}
+              onClick={() => handleScroll("how-it-works")}
+              style={{ cursor: "pointer" }}
+            >
+              How it Works
+            </Text>
+            <Text
+              fw={500}
+              onClick={() => handleScroll("features")}
+              style={{ cursor: "pointer" }}
+            >
+              Features
+            </Text>
           </Flex>
         </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4 }}>
+
+        <Grid.Col span={{ base: 2, md: 4 }}>
           <Flex justify="flex-end" align="center" gap="xs">
-            <MotionLink
-              href="/login"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              Log In
-            </MotionLink>
-            <MotionButton
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-              onClick={toggleColorScheme}
-            >
-              <i className="fa-solid fa-circle-half-stroke"></i>
-            </MotionButton>
+            {isSmallScreen ? (
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <MotionButton
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "10px",
+                      border: "none",
+                      cursor: "pointer",
+                      background: "none",
+                    }}
+                  >
+                    <i
+                      className="fa-solid fa-bars"
+                      style={{ color: "var(--mantine-color-dark-2)" }}
+                    ></i>
+                  </MotionButton>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    component="a"
+                    href="/login"
+                    leftSection={
+                      <i className="fa-solid fa-right-to-bracket"></i>
+                    }
+                  >
+                    Log In
+                  </Menu.Item>
+                  <Menu.Item
+                    onClick={toggleColorScheme}
+                    leftSection={
+                      <i className="fa-solid fa-circle-half-stroke"></i>
+                    }
+                  >
+                    Toggle Theme
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            ) : (
+              <>
+                <MotionLink
+                  href="/login"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Log In
+                </MotionLink>
+                <MotionButton
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={toggleColorScheme}
+                >
+                  <i className="fa-solid fa-circle-half-stroke"></i>
+                </MotionButton>
+              </>
+            )}
           </Flex>
         </Grid.Col>
       </Grid>
+
       <Box
         pos="absolute"
         bottom={0}

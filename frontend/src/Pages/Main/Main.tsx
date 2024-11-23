@@ -1,21 +1,25 @@
+import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { MotionLink } from "@/components/ui/MotionLink";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-
 import {
+  ActionIcon,
   Badge,
   Box,
   Card,
   Container,
   Flex,
+  Grid,
   Image,
+  Stack,
   Text,
   Title,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { motion } from "framer-motion";
+import parse from "html-react-parser";
+import { useEffect, useState } from "react";
 
 export function Main() {
   const { colorScheme } = useMantineColorScheme();
@@ -32,13 +36,15 @@ export function Main() {
     start: { y: 40, opacity: 0 },
     end: { y: 0, opacity: 1 },
   };
+
   const bounceVariants = {
     start: { y: 40 },
     bounce: { y: [0, 5, 0] },
   };
+
   const steps = [
     [
-      "Sign Up or Login In",
+      "<a href='/register' target='_blank'>Sign Up</a> or <a href='/login' target='_blank'>Log In</a>",
       "Create an account to start",
       "/img/loginPage.png",
       "/img/loginPageDark.png",
@@ -63,10 +69,49 @@ export function Main() {
     ],
   ];
 
+  const features = [
+    {
+      icon: "fa-layer-group",
+      title: "Deck Creation & Organization",
+      description:
+        "Easily create and organize flashcard decks. Pin and favorite decks for quick access, and use filtering and sorting to stay organized.",
+    },
+    {
+      icon: "fa-clock",
+      title: "Spaced Repetition",
+      description:
+        "Boost retention with the SM2 spaced repetition algorithm, ensuring efficient study by prioritizing cards that need more attention.",
+    },
+    {
+      icon: "fa-cogs",
+      title: "Flashcard Management",
+      description:
+        "Add, edit, and delete flashcards with ease. Mark cards as favorites for focused review and manage them within decks.",
+    },
+    {
+      icon: "fa-search",
+      title: "Powerful Search",
+      description:
+        "Find specific decks or flashcards instantly with a fast search engine. Search by name for decks or front/back text for quick results.",
+    },
+    {
+      icon: "fa-tv",
+      title: "Interactive UI & Animations",
+      description:
+        "Enjoy a seamless user experience with smooth flashcard animations and a responsive interface across devices.",
+    },
+    {
+      icon: "fa-sliders-h",
+      title: "Customizable Study Sessions",
+      description:
+        "Tailor your study sessions by focusing on favorited flashcards, decks, or specific concepts, allowing for personalized learning.",
+    },
+  ];
+
   return (
-    <Box>
+    <Box id="home">
       <Navbar />
-      <Box h="100vh">
+      <Box mih="100vh">
         <Container h="100%" pt="calc(60px)">
           <Flex h="100%" direction="column" align="center" gap="md">
             <motion.div
@@ -79,8 +124,7 @@ export function Main() {
                 size={isSmallScreen ? "2.5rem" : "4rem"}
                 ta="center"
                 style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 400,
+                  fontWeight: 600,
                   letterSpacing: "-0.02em",
                 }}
               >
@@ -163,7 +207,7 @@ export function Main() {
           </Flex>
         </Container>
       </Box>
-      <Box h="100vh">
+      <Box id="how-it-works" mih="100vh">
         <Flex
           pt="calc(60px)"
           align="center"
@@ -178,11 +222,11 @@ export function Main() {
             ta="center"
             style={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 400,
+              fontWeight: 600,
               letterSpacing: "-0.02em",
             }}
           >
-            How It Works
+            How it Works
           </Title>
 
           {/* Subtitle */}
@@ -251,7 +295,7 @@ export function Main() {
                         Step {index + 1}
                       </Badge>
                       <Text fw={600} size="lg">
-                        {step}
+                        {parse(step)}
                       </Text>
                     </Flex>
                     <Text mt="sm" c={theme.colors.gray[6]}>
@@ -280,6 +324,89 @@ export function Main() {
           </Container>
         </Flex>
       </Box>
+
+      {/* Features Section */}
+      <Box id="features" mih="100vh" pt="calc(80px)" pl={10} pr={10} pb={30}>
+        <Container size="md">
+          <Stack gap={50} align="center">
+            <Stack gap="md" align="center">
+              <Badge
+                variant="outline"
+                color="gray"
+                size="md"
+                style={{ fontSize: theme.fontSizes.md }}
+              >
+                Packed with Features
+              </Badge>
+              <Title
+                order={1}
+                size={isSmallScreen ? "2rem" : "4rem"} // Reduced size for small screens
+                ta="center"
+                style={{
+                  letterSpacing: "-0.02em",
+                  fontWeight: 600,
+                }}
+              >
+                Transform Your Study Habits with Flipstax
+              </Title>
+            </Stack>
+          </Stack>
+          <Grid gutter="sm" align="center" pt={20}>
+            {features.map((feature, index) => (
+              <Grid.Col key={index} span={{ base: 12, sm: 6 }}>
+                <Card
+                  padding={isSmallScreen ? "sm" : "xl"}
+                  radius="md"
+                  withBorder
+                  style={{
+                    height: "100%",
+                    maxWidth: isSmallScreen ? "100%" : "auto",
+                    transition: "box-shadow 0.2s ease",
+                    margin: "8 8 8 8",
+                  }}
+                >
+                  <Flex
+                    direction={isSmallScreen ? "column" : "row"}
+                    gap="md"
+                    align="center"
+                  >
+                    <ActionIcon
+                      variant="light"
+                      color="blue"
+                      size={isSmallScreen ? "lg" : "xl"}
+                      radius="md"
+                    >
+                      <i className={`fa-solid ${feature.icon}`}></i>
+                    </ActionIcon>
+                    <Stack gap="xs" align={isSmallScreen ? "center" : "start"}>
+                      <Title
+                        order={3}
+                        style={{
+                          fontSize: isSmallScreen
+                            ? theme.fontSizes.md
+                            : theme.fontSizes.lg,
+                        }}
+                      >
+                        {feature.title}
+                      </Title>
+                      <Text
+                        c="dimmed"
+                        style={{
+                          fontSize: theme.fontSizes.sm,
+                          textAlign: isSmallScreen ? "center" : "left",
+                        }}
+                      >
+                        {feature.description}
+                      </Text>
+                    </Stack>
+                  </Flex>
+                </Card>
+              </Grid.Col>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+      <Footer />
     </Box>
   );
 }
