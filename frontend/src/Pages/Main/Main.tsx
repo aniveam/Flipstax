@@ -252,15 +252,6 @@ export function Main() {
             >
               {/* Steps Section */}
               <Box w={isSmallScreen ? "100%" : "50%"} p="md">
-                <Title
-                  mb="lg"
-                  ta="center"
-                  size={isSmallScreen ? "md" : "xl"}
-                  fw={400}
-                  style={{ fontFamily: "Inter, sans-serif" }}
-                >
-                  Step-by-Step Guide
-                </Title>
                 {steps.map(([step, description], index) => (
                   <Card
                     key={index}
