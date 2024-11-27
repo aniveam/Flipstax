@@ -1,5 +1,6 @@
 import { DeckModal } from "@/components/ui/DeckModal";
 import { FlashcardModal } from "@/components/ui/FlashcardModal";
+import { FolderModal } from "@/components/ui/FolderModal";
 import { MotionButton } from "@/components/ui/MotionButton";
 import { PracticeModal } from "@/components/ui/PracticeModal";
 import { useAuth } from "@/context/AuthContext";
@@ -7,6 +8,7 @@ import { Decks } from "@/Pages/Dashboard/Decks";
 import { Flashcards } from "@/Pages/Dashboard/Flashcards";
 import { Practice } from "@/Pages/Dashboard/Practice";
 import { fetchDecks } from "@/redux/deckSlice";
+import { fetchFolders } from "@/redux/folderSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Flashcard from "@/types/Flashcard";
 import {
@@ -31,6 +33,13 @@ export function Home() {
   const { signOut } = useAuth();
   const dispatch = useAppDispatch();
   const { deckId } = useParams();
+
+  // Folders
+  const [folderOpened, setFolderOpened] = useState<boolean>(false);
+  const toggleFolderModal = () => setFolderOpened(!folderOpened);
+  const [folderMode, setFolderMode] = useState<
+    "create" | "edit" | "delete" | "list" | ""
+  >("");
 
   // Decks
   const [deckOpened, setDeckOpened] = useState<boolean>(false);
@@ -68,6 +77,7 @@ export function Home() {
   useEffect(() => {
     const fetchUserDecks = () => {
       dispatch(fetchDecks());
+      dispatch(fetchFolders());
     };
     document.title = "Dashboard" + " • Flipstax";
     fetchUserDecks();
@@ -144,12 +154,20 @@ export function Home() {
             setDeckMode={setDeckMode}
             setDeckOpened={setDeckOpened}
             toggleDeckModal={toggleDeckModal}
+            setFolderMode={setFolderMode}
+            setFolderOpened={setFolderOpened}
+            toggleFolderModal={toggleFolderModal}
           />
         )}
       </AppShell.Navbar>
       <AppShell.Main>{practiceContent}</AppShell.Main>
 
       {/* Modals */}
+      <FolderModal
+        mode={folderMode}
+        toggleFolderModal={toggleFolderModal}
+        folderOpened={folderOpened}
+      />
       <DeckModal
         mode={deckMode}
         toggleDeckModal={toggleDeckModal}

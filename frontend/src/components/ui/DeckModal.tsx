@@ -1,6 +1,7 @@
 import { createDeck, deleteDeck, editDeck } from "@/redux/deckSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+  Alert,
   Button,
   Flex,
   Modal,
@@ -64,6 +65,7 @@ export function DeckModal({
             _id: selectedDeck._id,
             name: deckName,
             pinnedStatus: selectedDeck.pinned,
+            folderIds: selectedDeck.folderIds,
           })
         );
       }
@@ -89,9 +91,17 @@ export function DeckModal({
   const getModalBody = () => {
     if (mode === "delete") {
       return (
-        <Text size="sm" c="dimmed">
-          Are you sure you want to delete this deck?
-        </Text>
+        <>
+          <Text size="sm" c="dimmed">
+            Are you sure you want to delete this deck?
+          </Text>
+          <Alert
+            variant="light"
+            color="yellow"
+            title="Note: Deleting this deck will also delete all of its flashcards"
+            icon={<i className="fa-solid fa-circle-info"></i>}
+          ></Alert>
+        </>
       );
     } else {
       return (

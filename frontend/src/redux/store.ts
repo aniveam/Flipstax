@@ -3,6 +3,7 @@ import flashcardSlice from "@/redux/flashcardSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import folderSlice from "./folderSlice";
 import practiceSlice from "./practiceSlice";
 
 const deckPersistConfig = {
@@ -11,7 +12,14 @@ const deckPersistConfig = {
   whitelist: ["selectedDeck"],
 };
 
+const folderPersistConfig = {
+  key: "folders",
+  storage,
+  whitelist: ["selectedFolder"],
+};
+
 const rootReducer = combineReducers({
+  folders: persistReducer(folderPersistConfig, folderSlice),
   decks: persistReducer(deckPersistConfig, deckSlice),
   flashcards: flashcardSlice,
   practice: practiceSlice,
@@ -22,7 +30,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredPaths: ["decks.selectedDeck"],
+        ignoredPaths: ["decks.selectedDeck", "folders.selectedFolder"],
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     }),

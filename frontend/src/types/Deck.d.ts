@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 interface Deck {
   _id: string;
   name: string;
+  folderIds: string[] | null;
   userId: ObjectId;
   createdAt: Date;
   updatedAt: Date;

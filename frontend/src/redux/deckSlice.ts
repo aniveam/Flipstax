@@ -34,12 +34,18 @@ export const createDeck = createAsyncThunk<Deck, { name: string }>(
 
 export const editDeck = createAsyncThunk<
   { deck: Deck; flashcardCount: number },
-  { _id: string; name: string; pinnedStatus: boolean }
->("decks/editDeck", async ({ _id, name, pinnedStatus }) => {
+  {
+    _id: string;
+    name: string;
+    pinnedStatus: boolean;
+    folderIds: string[] | null;
+  }
+>("decks/editDeck", async ({ _id, name, pinnedStatus, folderIds }) => {
   const response = await api.put("/decks", {
     deckId: _id,
     name,
     pinned: pinnedStatus,
+    folderIds,
   });
   return response.data;
 });

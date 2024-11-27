@@ -187,12 +187,10 @@ export function Flashcards({
               <Menu.Item
                 onClick={() => handleFilterBy("all")}
                 leftSection={
-                  <ActionIcon size="sm" variant="light">
-                    <i
-                      className="fa-solid fa-list"
-                      style={{ fontSize: "12px" }}
-                    ></i>
-                  </ActionIcon>
+                  <i
+                    className="fa-solid fa-list"
+                    style={{ fontSize: "12px" }}
+                  ></i>
                 }
               >
                 All flashcards
@@ -200,12 +198,10 @@ export function Flashcards({
               <Menu.Item
                 onClick={() => handleFilterBy("favorites")}
                 leftSection={
-                  <ActionIcon color="yellow" variant="light" size="sm">
-                    <i
-                      className="fa-solid fa-star"
-                      style={{ fontSize: "12px" }}
-                    ></i>
-                  </ActionIcon>
+                  <i
+                    className="fa-solid fa-star"
+                    style={{ fontSize: "12px", color: "#FAB007" }}
+                  ></i>
                 }
               >
                 Favorite flashcards

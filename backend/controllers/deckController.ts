@@ -49,12 +49,12 @@ const createDeck = async (req: AuthenticatedRequest, res: Response) => {
 const editDeck = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { deckId, name, pinned } = req.body;
+    const { deckId, name, pinned, folderIds } = req.body;
 
     if (userId) {
       const deck = await Deck.findOneAndUpdate(
         { _id: deckId },
-        { name, pinned },
+        { name, pinned, folderIds },
         { new: true } // This ensures the updated deck is returned
       );
       if (deck) {
