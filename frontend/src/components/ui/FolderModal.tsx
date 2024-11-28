@@ -1,4 +1,4 @@
-import { editDeck } from "@/redux/deckSlice";
+import { editDeck, removeFolderFromDecks } from "@/redux/deckSlice";
 import { createFolder, deleteFolder, editFolder } from "@/redux/folderSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -157,7 +157,9 @@ export function FolderModal({
             })
           );
         } else if (mode === "delete") {
-          dispatch(deleteFolder({ _id: selectedFolder._id }));
+          dispatch(deleteFolder({ _id: selectedFolder._id })).then(() => {
+            dispatch(removeFolderFromDecks(selectedFolder._id));
+          });
         }
       }
     }

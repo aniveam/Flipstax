@@ -76,6 +76,13 @@ const deckSlice = createSlice({
       const { deck } = action.payload;
       state.selectedDeck = deck;
     },
+    removeFolderFromDecks: (state, action) => {
+      const folderId = action.payload;
+      // Update decks by removing the folderId∏
+      state.decks.forEach((deck) => {
+        deck.folderIds = (deck.folderIds || []).filter((id) => id !== folderId);
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -182,5 +189,9 @@ const deckSlice = createSlice({
   },
 });
 
-export const { updateFlashcardCount, updateSelectedDeck } = deckSlice.actions;
+export const {
+  updateFlashcardCount,
+  updateSelectedDeck,
+  removeFolderFromDecks,
+} = deckSlice.actions;
 export default deckSlice.reducer;

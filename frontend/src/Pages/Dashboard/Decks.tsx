@@ -163,7 +163,7 @@ export function Decks({
     <>
       <AppShell.Section>
         <Flex justify="space-between" align="center">
-          {selectedFolder ? (
+          {selectedFolder && folderId != null ? (
             <Flex
               onClick={() => {
                 dispatch(updateSelectedFolder({ folder: null }));
