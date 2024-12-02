@@ -2,10 +2,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
-import authRoutes from "../routes/auth";
-import deckRoutes from "../routes/deck";
-import flashcardRoutes from "../routes/flashcard";
-import folderRoutes from "../routes/folder";
+import authRoutes from "./routes/auth";
+import deckRoutes from "./routes/deck";
+import flashcardRoutes from "./routes/flashcard";
+import folderRoutes from "./routes/folder";
 
 dotenv.config();
 
