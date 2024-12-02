@@ -9,7 +9,7 @@ import folderRoutes from "./routes/folder";
 
 dotenv.config();
 
-const PORT = process.env.port || 5000;
+const PORT = process.env.PORT || 5000;
 const app = express();
 const prodOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2];
 const devOrigin = ["http://localhost:5173"];
