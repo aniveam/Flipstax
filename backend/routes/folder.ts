@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   createFolder,
   deleteFolder,
@@ -7,7 +7,7 @@ import {
 } from "../controllers/folderController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", authenticateToken, fetchFolders);
 router.post("/", authenticateToken, createFolder);

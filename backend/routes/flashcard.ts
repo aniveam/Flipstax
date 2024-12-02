@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   createFlashcard,
   deleteFlashcard,
@@ -7,7 +7,7 @@ import {
 } from "../controllers/flashcardController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", authenticateToken, fetchFlashcards);
 router.post("/", authenticateToken, createFlashcard);

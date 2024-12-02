@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   createDeck,
   deleteDeck,
@@ -7,7 +7,7 @@ import {
 } from "../controllers/deckController";
 import { authenticateToken } from "../middlewares/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", authenticateToken, fetchDecks);
 router.post("/", authenticateToken, createDeck);
