@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 interface UserPayload {
   id: string;
@@ -22,7 +22,7 @@ const authenticateToken = async (
     return;
   }
   try {
-    verify(token, process.env.JWT_TOKEN as string, (err, user) => {
+    jwt.verify(token, process.env.JWT_TOKEN as string, (err, user) => {
       if (err) {
         res.status(403).json({ error: "Auth token denied" });
         return;

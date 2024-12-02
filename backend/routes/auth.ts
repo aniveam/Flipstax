@@ -1,10 +1,10 @@
 import axios from "axios";
 import { hash, compareSync } from "bcryptjs";
-import { Response, Router } from "express";
+import express, { Response } from "express";
 import { sign } from "jsonwebtoken";
 import User from "../models/User";
 
-const router = Router();
+const router = express.Router();
 
 router.post("/register", async (req, res: Response) => {
   try {
