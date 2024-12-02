@@ -9,7 +9,7 @@ import folderRoutes from "./routes/folder";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9756;
 const app = express();
 const prodOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2];
 const devOrigin = ["http://localhost:5173"];
@@ -41,9 +41,15 @@ app.use("/api/decks", deckRoutes);
 app.use("/api/flashcards", flashcardRoutes);
 app.use("/api/folders", folderRoutes);
 
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("Connected to MongoDB..."))
-  .catch((err) => console.log(err));
+async function connectToMongo() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI as string);
+    console.log("Connected to MongoDB...");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    process.exit(1); // Stop the application if MongoDB connection fails
+  }
+}
+connectToMongo();
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
