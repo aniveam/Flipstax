@@ -12,25 +12,42 @@ import {
   Image,
   Stack,
   Text,
+  Timeline,
   Title,
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { motion } from "framer-motion";
-import parse from "html-react-parser";
 import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 export function Main() {
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
-  const imgType = colorScheme === "light" ? 2 : 3;
-  const [img, setImg] = useState<[number, number]>([0, imgType]);
+  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    setImg((prev) => [prev[0], imgType]);
-  }, [colorScheme]);
+    const timer = setInterval(() => {
+      setActiveStep((prevStep) => {
+        if (prevStep < 4) return prevStep + 1;
+        clearInterval(timer);
+        return prevStep;
+      });
+    }, 1500);
+
+    return () => clearInterval(timer);
+  }, []);
+  
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.25,
+  });
+  const { ref: featuresRef, inView: featuresInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.25,
+  });
 
   const slideVariants = {
     start: { y: 40, opacity: 0 },
@@ -41,33 +58,6 @@ export function Main() {
     start: { y: 40 },
     bounce: { y: [0, 5, 0] },
   };
-
-  const steps = [
-    [
-      "<a href='/register' target='_blank'>Sign Up</a> or <a href='/login' target='_blank'>Log In</a>",
-      "Create an account to start",
-      "/img/loginPage.png",
-      "/img/loginPageDark.png",
-    ],
-    [
-      "Create Decks",
-      "Add new decks and organize your flashcards",
-      "/img/createDeck.png",
-      "/img/createDeckDark.png",
-    ],
-    [
-      "Add Flashcards",
-      "Create flashcards for each deck with front and back text",
-      "/img/createFlashcard.png",
-      "/img/createFlashcardDark.png",
-    ],
-    [
-      "Practice Modes",
-      "Choose between studying all flashcards, focusing on favorites, or using the spaced repetition algorithm",
-      "/img/practiceModes.png",
-      "/img/practiceModesDark.png",
-    ],
-  ];
 
   const features = [
     {
@@ -217,180 +207,270 @@ export function Main() {
           gap="md"
         >
           {/* Main Title */}
-          <Title
-            size={isSmallScreen ? "2.5rem" : "4rem"}
-            ta="center"
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-            }}
+          <motion.div
+            ref={ref}
+            variants={slideVariants}
+            initial="start"
+            animate={inView ? "end" : "start"}
+            transition={{ duration: 0.9 }}
           >
-            How it Works
-          </Title>
-
-          {/* Subtitle */}
-          <Title
-            size={isSmallScreen ? "md" : "xl"}
-            fw={500}
-            ta="center"
-            style={{
-              fontFamily: "Inter, sans-serif",
-            }}
-          >
-            Empower your study routine in just a few steps
-          </Title>
-
-          {/* Step-by-Step Guide */}
-          <Container size="lg" p={isSmallScreen ? "xs" : "md"}>
-            <Flex
-              align="center"
-              justify="space-between"
-              direction={isSmallScreen ? "column" : "row"}
-              gap="lg"
-              h="100%"
+            <Title
+              size={isSmallScreen ? "2.5rem" : "4rem"}
+              ta="center"
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+              }}
             >
-              {/* Steps Section */}
-              <Box w={isSmallScreen ? "100%" : "50%"} p="md">
-                {steps.map(([step, description], index) => (
-                  <Card
-                    key={index}
-                    bg={
-                      index === img[0]
-                        ? colorScheme === "light"
-                          ? theme.colors.blue[0]
-                          : theme.colors.dark[6]
-                        : colorScheme === "light"
-                        ? theme.colors.gray[0]
-                        : theme.colors.dark[7]
-                    }
-                    onClick={() => setImg([index, imgType])}
-                    style={{
-                      cursor: "pointer",
-                      transition: "transform 0.2s ease",
-                      transform: index === img[0] ? "scale(1.02)" : "scale(1)",
-                    }}
-                    shadow={index === img[0] ? "lg" : "sm"}
-                    padding="lg"
-                    radius="md"
-                    withBorder
-                    mb="md"
-                  >
-                    <Flex align="center" gap="sm">
-                      <Badge
-                        size="lg"
-                        radius="sm"
-                        variant="light"
-                        color={theme.colors.blue[5]}
-                      >
-                        Step {index + 1}
-                      </Badge>
-                      <Text fw={600} size="lg">
-                        {parse(step)}
-                      </Text>
-                    </Flex>
-                    <Text mt="sm" c={theme.colors.gray[6]}>
-                      {description}
-                    </Text>
-                  </Card>
-                ))}
-              </Box>
+              How it Works
+            </Title>
 
-              {/* Image Section */}
-              <Box w={isSmallScreen ? "100%" : "50%"}>
-                <Image
-                  radius="md"
-                  src={steps[img[0]][img[1]]}
-                  w="100%"
-                  style={{
-                    border: `1px solid ${
-                      colorScheme === "light"
-                        ? theme.colors.gray[2]
-                        : theme.colors.dark[5]
-                    }`,
-                  }}
-                />
-              </Box>
-            </Flex>
-          </Container>
+            {/* Subtitle */}
+            <Title
+              size={isSmallScreen ? "md" : "xl"}
+              fw={500}
+              ta="center"
+              style={{
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              Empower your study routine in just a few steps
+            </Title>
+            {/* Step-by-Step Guide */}
+            <Container size="lg" mt={50} p={isSmallScreen ? "xs" : "md"}>
+              <Flex
+                align="center"
+                justify="space-between"
+                direction={isSmallScreen ? "column" : "row"}
+                gap="lg"
+                h="100%"
+              >
+                <Timeline active={activeStep} bulletSize={40} lineWidth={2}>
+                  <Timeline.Item
+                    bullet={<i className="fa-solid fa-user-plus"></i>}
+                    title={
+                      <motion.div
+                        variants={slideVariants}
+                        initial="start"
+                        animate={activeStep >= 0 ? "end" : "start"}
+                        transition={{ duration: 0.9 }}
+                      >
+                        Create an account
+                      </motion.div>
+                    }
+                  >
+                    <motion.div
+                      variants={slideVariants}
+                      initial="start"
+                      animate={activeStep >= 0 ? "end" : "start"}
+                      transition={{ duration: 0.9 }}
+                    >
+                      <Text c="dimmed" size="lg">
+                        Sign up with your email or log in with Google.
+                      </Text>
+                    </motion.div>
+                  </Timeline.Item>
+
+                  <Timeline.Item
+                    bullet={<i className="fa-solid fa-folder"></i>}
+                    title={
+                      <motion.div
+                        variants={slideVariants}
+                        initial="start"
+                        animate={activeStep >= 0 ? "end" : "start"}
+                        transition={{ duration: 0.9, delay: 1.5 }}
+                      >
+                        Organize Folders
+                      </motion.div>
+                    }
+                  >
+                    <motion.div
+                      variants={slideVariants}
+                      initial="start"
+                      animate={activeStep >= 0 ? "end" : "start"}
+                      transition={{ duration: 0.9, delay: 1.5 }}
+                    >
+                      <Text c="dimmed" size="lg">
+                        Organize your decks into folders by classes, topics,
+                        subjects, or any category that suits your study needs.
+                      </Text>
+                    </motion.div>
+                  </Timeline.Item>
+
+                  <Timeline.Item
+                    bullet={<i className="fa-solid fa-clipboard-list"></i>}
+                    title={
+                      <motion.div
+                        variants={slideVariants}
+                        initial="start"
+                        animate={activeStep >= 0 ? "end" : "start"}
+                        transition={{ duration: 0.9, delay: 3.0 }}
+                      >
+                        Build Decks
+                      </motion.div>
+                    }
+                  >
+                    <motion.div
+                      variants={slideVariants}
+                      initial="start"
+                      animate={activeStep >= 0 ? "end" : "start"}
+                      transition={{ duration: 0.9, delay: 3.0 }}
+                    >
+                      <Text c="dimmed" size="lg">
+                        Create decks to organize your flashcards. You can
+                        update, add, or remove decks from folders at any time.
+                      </Text>
+                    </motion.div>
+                  </Timeline.Item>
+
+                  <Timeline.Item
+                    bullet={<i className="fa-solid fa-file-alt"></i>}
+                    title={
+                      <motion.div
+                        variants={slideVariants}
+                        initial="start"
+                        animate={activeStep >= 0 ? "end" : "start"}
+                        transition={{ duration: 0.9, delay: 4.5 }}
+                      >
+                        Make Flashcards
+                      </motion.div>
+                    }
+                  >
+                    <motion.div
+                      variants={slideVariants}
+                      initial="start"
+                      animate={activeStep >= 0 ? "end" : "start"}
+                      transition={{ duration: 0.9, delay: 4.5 }}
+                    >
+                      <Text c="dimmed" size="lg">
+                        Add personalized flashcards inside decks. Create
+                        questions, terms, or definitions to test your knowledge.
+                        You can update, add, or remove flashcards at any time.
+                      </Text>
+                    </motion.div>
+                  </Timeline.Item>
+
+                  <Timeline.Item
+                    bullet={<i className="fa-solid fa-cogs"></i>}
+                    title={
+                      <motion.div
+                        variants={slideVariants}
+                        initial="start"
+                        animate={activeStep >= 0 ? "end" : "start"}
+                        transition={{ duration: 0.9, delay: 6.0 }}
+                      >
+                        Choose Practice Mode
+                      </motion.div>
+                    }
+                  >
+                    <motion.div
+                      variants={slideVariants}
+                      initial="start"
+                      animate={activeStep >= 0 ? "end" : "start"}
+                      transition={{ duration: 0.9, delay: 6.0 }}
+                    >
+                      <Text c="dimmed" size="lg">
+                        Pick the practice mode that suits your learning style.
+                        You can practice all flashcards, focus on your
+                        favorites, or engage in spaced repetition for optimal
+                        retention.
+                      </Text>
+                    </motion.div>
+                  </Timeline.Item>
+                </Timeline>
+              </Flex>
+            </Container>
+          </motion.div>
         </Flex>
       </Box>
 
       {/* Features Section */}
       <Box id="features" mih="100vh" pt="calc(80px)" pl={10} pr={10} pb={30}>
-        <Container size="md">
-          <Stack gap={50} align="center">
-            <Stack gap="md" align="center">
-              <Badge variant="outline" color="gray" size="lg" radius="lg">
-                Packed with Features
-              </Badge>
-              <Title
-                order={1}
-                size={isSmallScreen ? "2rem" : "4rem"}
-                ta="center"
-                style={{
-                  letterSpacing: "-0.02em",
-                  fontWeight: 600,
-                }}
-              >
-                Transform Your Study Habits with Flipstax
-              </Title>
-            </Stack>
-          </Stack>
-          <Grid gutter="sm" align="center" pt={20}>
-            {features.map((feature, index) => (
-              <Grid.Col key={index} span={{ base: 12, sm: 6 }}>
-                <Card
-                  padding={isSmallScreen ? "sm" : "xl"}
-                  radius="md"
-                  withBorder
+        <motion.div
+          ref={featuresRef}
+          variants={slideVariants}
+          initial="start"
+          animate={featuresInView ? "end" : ""}
+          transition={{ duration: 0.9 }}
+        >
+          <Container size="md">
+            <Stack gap={50} align="center">
+              <Stack gap="md" align="center">
+                <Badge variant="outline" color="gray" size="lg" radius="lg">
+                  Packed with Features
+                </Badge>
+                <Title
+                  order={1}
+                  size={isSmallScreen ? "2rem" : "4rem"}
+                  ta="center"
                   style={{
-                    height: "100%",
-                    maxWidth: isSmallScreen ? "100%" : "auto",
-                    transition: "box-shadow 0.2s ease",
-                    margin: "8 8 8 8",
+                    letterSpacing: "-0.02em",
+                    fontWeight: 600,
                   }}
                 >
-                  <Flex
-                    direction={isSmallScreen ? "column" : "row"}
-                    gap="md"
-                    align={isSmallScreen ? "center" : "start"}
+                  Transform Your Study Habits with Flipstax
+                </Title>
+              </Stack>
+            </Stack>
+            <Grid gutter="sm" align="center" pt={20}>
+              {features.map((feature, index) => (
+                <Grid.Col key={index} span={{ base: 12, sm: 6 }}>
+                  <Card
+                    padding={isSmallScreen ? "sm" : "xl"}
+                    radius="md"
+                    withBorder
+                    style={{
+                      height: "100%",
+                      maxWidth: isSmallScreen ? "100%" : "auto",
+                      transition: "box-shadow 0.2s ease",
+                      margin: "8 8 8 8",
+                    }}
                   >
-                    <ActionIcon
-                      variant="light"
-                      color="blue"
-                      size={isSmallScreen ? "lg" : "xl"}
-                      radius="md"
+                    <Flex
+                      direction={isSmallScreen ? "column" : "row"}
+                      gap="md"
+                      align={isSmallScreen ? "center" : "start"}
                     >
-                      <i className={`fa-solid ${feature.icon}`}></i>
-                    </ActionIcon>
-                    <Stack gap="xs" align={isSmallScreen ? "center" : "start"}>
-                      <Title
-                        order={3}
-                        style={{
-                          fontSize: isSmallScreen
-                            ? theme.fontSizes.md
-                            : theme.fontSizes.lg,
-                        }}
+                      <ActionIcon
+                        variant="light"
+                        color="blue"
+                        size={isSmallScreen ? "lg" : "xl"}
+                        radius="md"
                       >
-                        {feature.title}
-                      </Title>
-                      <Text
-                        c="dimmed"
-                        style={{
-                          fontSize: theme.fontSizes.sm,
-                          textAlign: isSmallScreen ? "center" : "left",
-                        }}
+                        <i className={`fa-solid ${feature.icon}`}></i>
+                      </ActionIcon>
+                      <Stack
+                        gap="xs"
+                        align={isSmallScreen ? "center" : "start"}
                       >
-                        {feature.description}
-                      </Text>
-                    </Stack>
-                  </Flex>
-                </Card>
-              </Grid.Col>
-            ))}
-          </Grid>
-        </Container>
+                        <Title
+                          order={3}
+                          style={{
+                            fontSize: isSmallScreen
+                              ? theme.fontSizes.md
+                              : theme.fontSizes.lg,
+                          }}
+                        >
+                          {feature.title}
+                        </Title>
+                        <Text
+                          c="dimmed"
+                          style={{
+                            fontSize: theme.fontSizes.sm,
+                            textAlign: isSmallScreen ? "center" : "left",
+                          }}
+                        >
+                          {feature.description}
+                        </Text>
+                      </Stack>
+                    </Flex>
+                  </Card>
+                </Grid.Col>
+              ))}
+            </Grid>
+          </Container>
+        </motion.div>
       </Box>
       <Footer />
     </Box>
